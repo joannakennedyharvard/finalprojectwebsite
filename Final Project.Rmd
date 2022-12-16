@@ -1,0 +1,603 @@
+---
+title: "Final Project"
+author: "Joanna Kennedy"
+date: "2022-11-22"
+output: github_document
+---
+
+
+WHEN BUILDING IT ON RSTUDIO NEED TO BUILD WEBSITE BEFOR EYOU PUSH TO GIT HUB
+
+histograms and scatterplots - min plot number
+dendrogram
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(tidyverse)
+library(ggrepel)
+library(caret)
+library(MLmetrics)
+library(stats)
+library(dplyr)
+library(glmnet)
+```
+
+
+```{r}
+setwd("C:/Users/jjken/Desktop/Harvard/Fall 2022/BST 260/finalprojectwebsite")
+df = read.csv(file = 'Student Mental health.csv')
+```
+
+Cleaning
+```{r}
+head(df)
+```
+
+```{r}
+apply(df, 2, unique)
+```
+
+
+???????WHEN NUMBER OF YES IS SMALL SHOULD I SPLIT THE TRAIN AND TEST TO INCLUDE ALL YES IN BOTH TRAIN AND TEST (or some for even amount) - should I double dip
+--> should I decrease the size of testing to get half and half and have all in training (OR 1/3)
+```{r}
+
+for (i in 1:ncol(df)){
+  
+  temp <- as.data.frame(df[,i])
+  nm <- colnames(df)[i]
+  colnames(temp) <- "response"
+  
+  counts <- temp %>% group_by(response) %>% dplyr::summarise(count = n())
+  
+  plot<- ggplot(data=counts, aes(x=response, y=count, fill=response)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(label=count)) +
+    theme(axis.text.x = element_text(size = 6, angle = 90)) +
+    ggtitle(nm)
+  print(plot)
+  
+}
+```
+
+
+```{r}
+colnames(df) = c("day","gender","age", "course","grade","gpa","married", "depression","anxiety","panic_attack", "treatment")
+```
+
+```{r}
+sapply(df, function(x) sum(is.na(x)))
+```
+
+```{r}
+df <- df %>% filter(!is.na(df$age))
+```
+
+```{r}
+df <- as.data.frame(apply(df, 2, tolower))
+```
+
+
+year and month are the same so just day and time are different
+```{r}
+df <- separate(df, col=day, into=c("day", "time"), sep = " ")
+df <- separate(df, col=day, into=c("day", "rest"), sep = "/")
+df$rest <- NULL
+df <- separate(df, col=time, into=c("hour", "minute"), sep = ":")
+```
+
+round hour and get rid of minute
+```{r}
+df$hour <- as.numeric(df$hour)
+df$minute <- as.numeric(df$minute)
+df$round <- 0
+df[which(df$minute >29), 'round'] <- 1
+df$hour <- df$hour + df$round
+df$round <- NULL
+df$minute <- NULL
+```
+
+```{r}
+df$course <- sapply(df$course, str_trim)
+df$course <- df$course %>% str_replace("^engin.*","engineering") %>% str_replace("^fiqh.*","fiqh") %>% str_replace("^law.*", "laws") %>% str_replace(".*irkhs$", "kirkhs") %>% str_replace(".*nursing$", "nursing")
+df %>% arrange(course) %>% group_by(course) %>% dplyr::summarise(count = n()) %>% arrange(-count)
+```
+
+```{r}
+df$grade <- df$grade %>% str_replace("year 1","9") %>% str_replace("year 2","10") %>% str_replace("year 3", "11") %>% str_replace("year 4", "12")
+```
+
+```{r}
+df$gpa <- sapply(df$gpa, str_trim)
+df <- separate(df, col=gpa, into=c("low", "gpa"), sep = " - ")
+df$low <- NULL
+```
+
+```{r}
+
+for (i in 1:ncol(df)){
+  
+  temp <- as.data.frame(df[,i])
+  nm <- colnames(df)[i]
+  colnames(temp) <- "response"
+  
+  counts <- as.data.frame(temp) %>% group_by(response) %>% dplyr::summarise(count = n())
+  
+  plot<- ggplot(data=counts, aes(x=response, y=count, fill=response)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(label=count)) +
+    theme(axis.text.x = element_text(size = 6, angle = 90)) +
+    ggtitle(nm)
+  print(plot)
+  
+}
+
+#ggplot(age_counts_mental_health, aes(x=mental_health, y=count)) +
+#  geom_point() +
+  
+
+```
+
+
+```{r}
+df[,c(1,2,4,6,7)]<-as.data.frame(apply(df[,c(1,2,4,6,7)], 2, as.numeric))
+numerical <- df[,c(1,2,4,6,7)]
+numerical_colnames <- c("day","hour", "age","grade","gpa")
+categorical <- df[,c(5)]
+categorical_colnames <- c("course")
+binary <- df[,c(3,8:12)]
+binary_colnames <- c("gender", "married", "depression", "anxiety", "panic_attack", "treatment") #"engineering", "bcs")
+```
+
+```{r}
+#apply(numerical,2,class)
+#apply(numerical,2,hist)
+```
+```{r}
+numerical
+```
+
+
+```{r}
+plot(cbind(numerical,binary))
+plot(numerical)
+```
+
+```{r}
+
+test <- df %>% group_by(grade,course) %>% dplyr::summarise(group_gpa=mean(gpa), count = n()) %>% filter(count>2)
+
+ggplot(test, aes(x=grade,y=group_gpa, color=course)) +
+  geom_line() +
+  geom_point()
+
+```
+
+```{r}
+test <- df %>% group_by(grade,course) %>% dplyr::summarise(group_gpa=mean(gpa), count = n()) %>% filter(count>2)
+
+ggplot(test, aes(grade, group_gpa)) + 
+  geom_jitter(aes(col=course)) + 
+  geom_smooth(aes(col=course), method="lm", se=F)
+```
+
+
+```{r}
+
+explore <- df
+
+label_mental_health <- function(df,last_column){
+  df$mental_health <- ""
+  for (participant in 1:nrow(df)){
+    for (condition in 9:last_column){
+      if (df[participant,][condition] == "yes"){
+        df[participant,][last_column+1] <- paste(df[participant,][last_column+1],colnames(df[condition]))
+      }
+    }
+  }
+  df$mental_health <- sapply(df$mental_health, str_squish)
+  return (df)
+}
+
+explore <- label_mental_health(explore, dim(explore)[2])
+```
+
+
+```{r}
+explore %>% group_by(mental_health) %>% dplyr::summarise(count = n())
+```
+```{r}
+
+for(i in 1:(ncol(numerical))){
+  
+  temp <- as.data.frame(numerical[,i])
+  nm <- colnames(numerical)[i]
+  colnames(temp) <- "response"
+  
+  temp$mental_health <- explore$mental_health
+  
+  counts <- as.data.frame(temp) %>% group_by(response,mental_health) %>% dplyr::summarise(count = n())
+  
+  plot<- ggplot(data=counts, aes(x=response, y=count, fill=response)) +
+    geom_bar(stat="identity") +
+    geom_text(aes(label=count)) +
+    facet_wrap(~mental_health, ncol=3) +
+    theme(axis.text.x = element_text(size = 6, angle = 90)) +
+    ggtitle(nm)
+  print(plot)
+  
+}
+
+```
+
+
+Chi Squared Test
+
+```{r}
+
+two_by_two <- data.frame(
+  depression = c("no", "yes"), 
+  men = 
+    c(sum(df$gender == "male" & df$depression == "no"), 
+      sum(df$gender == "male" & df$depression == "yes")), 
+  women = 
+    c(sum(df$gender == "female" & df$depression == "no"), 
+      sum(df$gender == "female" & df$depression == "yes")))
+
+two_by_two
+
+chisq_test <- two_by_two |> select(-depression) |> chisq.test()
+chisq_test
+
+```
+
+```{r}
+length(binary_colnames)
+length(binary)
+```
+```{r}
+binary_colnames
+```
+
+
+```{r}
+ncol(binary)
+binary
+```
+
+
+```{r}
+association <- c()
+for(i in 1:(ncol(binary)-1)){
+  for(j in (i+1):(ncol(binary))){
+    if (i != j){
+      print(binary_colnames[i])
+      print(binary_colnames[j])
+      test <- chisq.test(df[,i], df[,j])
+      print(test)
+      if (test$p.value < 0.05) {
+        association <- c(association, paste(binary_colnames[i], binary_colnames[j], sep = " vs. "))
+      }
+    }
+    
+  }
+}
+```
+```{r}
+association
+```
+
+Regression
+
+```{r}
+
+non_normal_numerical = c()
+for (i in 1:ncol(numerical)){
+  test <- shapiro.test(numerical[,i])
+  print(test)
+  
+  if (test$p.value < 0.05)
+    non_normal_numerical <- c(non_normal_numerical, numerical_colnames[i])
+}
+
+non_normal_numerical
+
+```
+
+```{r}
+
+for(i in 1:(ncol(numerical)-1)) {
+  for(j in (i+1):ncol(numerical)){
+    for(k in binary_colnames){
+      plot <- ggplot(df,aes(x=df[,numerical_colnames[i]], y=df[,numerical_colnames[j]], color=df[,k], group = df[,k])) +
+        #geom_boxplot() +
+        geom_point(position=position_jitter(h=0.07,w=0.07)) +
+        ylab(numerical_colnames[j]) +
+        xlab(numerical_colnames[i]) +
+        labs(color = k)
+      print(plot)
+    }
+  }
+}
+
+
+```
+
+I acknowledge gender as a categorical value rather than a binary value, but within the context of this datasets, students were categorized as either female or male.
+
+```{r}
+df
+```
+
+
+```{r}
+head(train)
+```
+
+
+```{r}
+#c("gender", "married", "depression", "anxiety", "panic_attack", "treatment", "engineering")
+
+traini <- sample(nrow(df), round(0.8*nrow(df)))
+testi <- c(1:nrow(df))[-traini]
+train <- df[traini, ]
+test <- df[testi, ]
+
+
+train$gender <- ifelse(train$gender == 'female',1,0)
+train$married <- ifelse(train$married == 'yes',1,0)
+train$depression <- ifelse(train$depression == 'yes',1,0)
+train$anxiety <- ifelse(train$anxiety == 'yes',1,0)
+train$panic_attack <- ifelse(train$panic_attack == 'yes',1,0)
+train$treatment <- ifelse(train$treatment == 'yes',1,0)
+train$engineering <- ifelse(train$course == 'engineering',1,0)
+train$bcs <- ifelse(train$course == 'bcs',1,0)
+
+test$gender <- ifelse(test$gender == 'female',1,0)
+test$married <- ifelse(test$married == 'yes',1,0)
+test$depression <- ifelse(test$depression == 'yes',1,0)
+test$anxiety <- ifelse(test$anxiety == 'yes',1,0)
+test$panic_attack <- ifelse(test$panic_attack == 'yes',1,0)
+test$treatment <- ifelse(test$treatment == 'yes',1,0)
+test$engineering <- ifelse(test$course == 'engineering',1,0)
+test$bcs <- ifelse(test$course == 'bcs',1,0)
+
+train <- train[,-5]
+test <- test[,-5]
+
+train <- train[,c(1,2,4:6,3,7:ncol(train))]
+test <- test[,c(1,2,4:6,3,7:ncol(test))]
+
+train
+test
+
+```
+
+
+
+Lasso Regression
+
+source: https://www.pluralsight.com/guides/linear-lasso-and-ridge-regression-with-r
+
+```{r}
+eval_results <- function(true, predicted, df) {
+  SSE <- sum((predicted - true)^2)
+  SST <- sum((true - mean(true))^2)
+  R_square <- 1 - SSE / SST
+  RMSE = sqrt(SSE/nrow(df))
+
+  
+  # Model performance metrics
+data.frame(
+  RMSE = RMSE,
+  Rsquare = R_square
+)
+  
+}
+```
+
+
+```{r}
+
+dummies_train <- dummyVars(depression~ ., data = train)
+dummies_test <- dummyVars(depression~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
+
+x = as.matrix(train_dummies)
+y_train = train$depression
+
+x_test = as.matrix(test_dummies)
+y_test = test$depression
+
+```
+
+
+```{r}
+
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
+
+```
+
+```{r}
+plot(lasso_reg)
+```
+
+want smaller RMSE
+```{r}
+
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
+
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
+
+```
+
+```{r}
+lasso_model$beta
+```
+
+
+
+```{r}
+colnames(train)
+```
+
+
+GLM AND KNN
+
+k
+accuracy
+binary
+
+```{r}
+for (k in 1:1){
+  knn_fit <- knn3(depression~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$depression))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$depression))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$depression))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$depression))$overall["Accuracy"])
+}
+
+
+
+for (k in 1:10){
+  knn_fit <- knn3(anxiety~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$anxiety))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$anxiety))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$anxiety))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$anxiety))$overall["Accuracy"])
+}
+```
+
+
+??????????????????????WARNING
+```{r}
+df
+```
+
+
+```{r}
+train
+```
+
+
+```{r}
+test
+```
+
+```{r}
+
+```
+
+```{r}
+head(train)
+```
+
+```{r}
+
+ks = c()
+train_accuracy = c()
+test_accuracy = c()
+binary_labels = c()
+
+for (i in 6:ncol(train)){
+  
+  colname <- colnames(train)[i]
+  if (colname == "treatment"){
+    next
+  }
+  
+  colnames(train)[i] <- "label"
+  colnames(test)[i] <- "label"
+  
+  print(colname)
+  
+  glm_1 <- glm(label~., data=train, family="binomial")
+  #predict(glm_1, train)
+  plot(glm_1)
+  
+  for (k in 1:10){
+    
+    knn_fit <- knn3(label~., data=train, k=k) 
+    p_hat_knn_train <- predict(knn_fit, train, type="prob")
+    y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_train, factor(train$label))
+    #print(confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    
+    p_hat_knn_test <- predict(knn_fit, test, type="prob")
+    y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_test, factor(test$label))
+    #print(confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    
+    ks <- c(ks, k)
+    train_accuracy <- c(train_accuracy, confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    test_accuracy <- c(test_accuracy, confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    binary_labels <- c(binary_labels, colname)
+  
+  }
+  
+  colnames(train)[i] <- colname
+  colnames(test)[i] <- colname
+}
+
+
+```
+
+
+
+```{r}
+
+binary_labels
+ks
+train_accuracy
+test_accuracy
+knn_dataframe <- data.frame(ks,train_accuracy,test_accuracy,binary_labels)
+knn_dataframe
+
+```
+
+```{r}
+ggplot(knn_dataframe, aes(x=ks)) +
+  geom_line(aes(y = train_accuracy), color = "red") + 
+  geom_line(aes(y = test_accuracy), color = "blue") +
+  facet_wrap(~binary_labels)
+```
+
+
+
+
+
+
+
+
