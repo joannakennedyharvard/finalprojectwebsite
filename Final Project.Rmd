@@ -5,6 +5,8 @@ date: "2022-11-22"
 output: github_document
 ---
 
+knit to html then add to yml
+
 
 WHEN BUILDING IT ON RSTUDIO NEED TO BUILD WEBSITE BEFOR EYOU PUSH TO GIT HUB
 

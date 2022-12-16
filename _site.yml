@@ -5,3 +5,5 @@ navbar:
   left:
     - text: "Home"
       href: Index.html
+    - text: "Model"
+      href: 
