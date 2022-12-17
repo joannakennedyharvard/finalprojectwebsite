@@ -5,14 +5,6 @@ date: "2022-11-22"
 output: github_document
 ---
 
-knit to html then add to yml
-
-
-WHEN BUILDING IT ON RSTUDIO NEED TO BUILD WEBSITE BEFOR EYOU PUSH TO GIT HUB
-
-histograms and scatterplots - min plot number
-dendrogram
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -45,9 +37,6 @@ head(df)
 apply(df, 2, unique)
 ```
 
-
-???????WHEN NUMBER OF YES IS SMALL SHOULD I SPLIT THE TRAIN AND TEST TO INCLUDE ALL YES IN BOTH TRAIN AND TEST (or some for even amount) - should I double dip
---> should I decrease the size of testing to get half and half and have all in training (OR 1/3)
 ```{r}
 
 for (i in 1:ncol(df)){
@@ -182,9 +171,10 @@ ggplot(test, aes(x=grade,y=group_gpa, color=course)) +
 ```
 
 ```{r}
-test <- df %>% group_by(grade,course) %>% dplyr::summarise(group_gpa=mean(gpa), count = n()) %>% filter(count>2)
+test <- df %>% group_by(grade,course) %>% dplyr::summarise(average_gpa=mean(gpa), count = n()) %>% filter(count>2)
 
-ggplot(test, aes(grade, group_gpa)) + 
+ggplot(test, aes(grade, average_gpa)) + 
+  ggtitle("Trends in GPA by Course") +
   geom_jitter(aes(col=course)) + 
   geom_smooth(aes(col=course), method="lm", se=F)
 ```
@@ -259,59 +249,63 @@ chisq_test
 
 ```
 
-```{r}
-length(binary_colnames)
-length(binary)
-```
-```{r}
-binary_colnames
-```
-
 
 ```{r}
-ncol(binary)
-binary
-```
 
-
-```{r}
 association <- c()
+all <- c()
+pvs <- c()
 for(i in 1:(ncol(binary)-1)){
   for(j in (i+1):(ncol(binary))){
     if (i != j){
-      print(binary_colnames[i])
-      print(binary_colnames[j])
       test <- chisq.test(df[,i], df[,j])
-      print(test)
+      compare <- paste(binary_colnames[i], binary_colnames[j], sep = " vs. ")
+      all <- c(all,compare)
+      pvs <- c(pvs,test$p.value)
       if (test$p.value < 0.05) {
-        association <- c(association, paste(binary_colnames[i], binary_colnames[j], sep = " vs. "))
+        association <- c(association, compare)
       }
     }
     
   }
 }
+
+chi_square_table <- data.frame(unlist(all),unlist(pvs))
+
 ```
 ```{r}
 association
+colnames(chi_square_table) <- c("Comparison","P Value")
+chi_square_table
 ```
 
-Regression
 
+
+Shapiro Wilk's Test
 ```{r}
 
+all <- c()
+normal <- c()
 non_normal_numerical = c()
 for (i in 1:ncol(numerical)){
   test <- shapiro.test(numerical[,i])
   print(test)
-  
-  if (test$p.value < 0.05)
+  all <- c(all,numerical_colnames[i])
+  if (test$p.value < 0.05){
     non_normal_numerical <- c(non_normal_numerical, numerical_colnames[i])
+    normal <- c(normal,FALSE)
+  }
+  normal <- c(normal,TRUE)
 }
+
+shap_table <- data.frame(unlist(all),unlist(normal))
+colnames(shap_table) <- c("Variable","Normal")
+shap_table
 
 non_normal_numerical
 
 ```
-
+Regression
 ```{r}
 
 for(i in 1:(ncol(numerical)-1)) {
@@ -332,15 +326,6 @@ for(i in 1:(ncol(numerical)-1)) {
 ```
 
 I acknowledge gender as a categorical value rather than a binary value, but within the context of this datasets, students were categorized as either female or male.
-
-```{r}
-df
-```
-
-
-```{r}
-head(train)
-```
 
 
 ```{r}
@@ -383,10 +368,286 @@ test
 
 
 
+GLM AND KNN
+
+```{r}
+for (k in 1:1){
+  knn_fit <- knn3(depression~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$depression))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$depression))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$depression))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$depression))$overall["Accuracy"])
+}
+
+
+
+for (k in 1:10){
+  knn_fit <- knn3(anxiety~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$anxiety))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$anxiety))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$anxiety))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$anxiety))$overall["Accuracy"])
+}
+```
+
+
+```{r}
+
+ks = c()
+train_accuracy = c()
+test_accuracy = c()
+binary_labels = c()
+
+for (i in 6:ncol(train)){
+  
+  colname <- colnames(train)[i]
+  if (colname == "treatment"){
+    next
+  }
+  
+  colnames(train)[i] <- "label"
+  colnames(test)[i] <- "label"
+  
+  print(colname)
+  
+  glm_1 <- glm(label~., data=train, family="binomial")
+  #predict(glm_1, train)
+  plot(glm_1)
+  
+  for (k in 1:15){
+    
+    knn_fit <- knn3(label~., data=train, k=k) 
+    p_hat_knn_train <- predict(knn_fit, train, type="prob")
+    y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_train, factor(train$label))
+    #print(confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    
+    p_hat_knn_test <- predict(knn_fit, test, type="prob")
+    y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_test, factor(test$label))
+    #print(confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    
+    ks <- c(ks, k)
+    train_accuracy <- c(train_accuracy, confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    test_accuracy <- c(test_accuracy, confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    binary_labels <- c(binary_labels, colname)
+  
+  }
+  
+  colnames(train)[i] <- colname
+  colnames(test)[i] <- colname
+}
+
+
+```
+
+
+
+```{r}
+
+knn_dataframe <- data.frame(ks,train_accuracy,test_accuracy,binary_labels)
+
+```
+
+```{r}
+ggplot(knn_dataframe, aes(x=ks)) +
+  geom_line(aes(y = train_accuracy), color = "red") + 
+  geom_line(aes(y = test_accuracy), color = "blue") +
+  facet_wrap(~binary_labels)
+```
+
+```{r}
+value <- c("Depression","Anxiety","Panic Attack","Gender","Married","BCS","Engineering")
+accuracy <- c()
+pvs <- c()
+sensitivity <- c()
+specificity <- c()
+baccuracy <- c()
+```
+
+
+Depression
+```{r}
+knn_fit <- knn3(depression~., data=train, k=7) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$depression))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$depression))
+cm
+```
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+
+Anxiety
+```{r}
+knn_fit <- knn3(anxiety~., data=train, k=2) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$anxiety))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$anxiety))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+
+Panic Attack
+```{r}
+knn_fit <- knn3(panic_attack~., data=train, k=5) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$panic_attack))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$panic_attack))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Treatment - not enough people in treatment so 0 people in the test set
+```{r}
+knn_fit <- knn3(treatment~., data=train, k=k) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$treatment))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+#cm <- confusionMatrix(y_hat_knn_test, factor(test$treatment))
+```
+
+Gender
+```{r}
+knn_fit <- knn3(gender~., data=train, k=9) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$gender))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$gender))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Married
+```{r}
+knn_fit <- knn3(married~., data=train, k=3) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$married))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$married))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+
+BCS
+```{r}
+knn_fit <- knn3(bcs~., data=train, k=4) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$bcs))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$bcs))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Engineering
+```{r}
+knn_fit <- knn3(engineering~., data=train, k=9) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$engineering))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$engineering))
+```
+
+```{r}
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+
+```{r}
+ks <- c(7,2,5,9,3,4,9)
+data.frame(Variable=value, K=ks,Accuracy=accuracy, P_Value=pvs, Sensitivity=sensitivity, Specificity=specificity, Balance_Accuracy=baccuracy)
+```
+
+
+
+
+
 Lasso Regression
 
-source: https://www.pluralsight.com/guides/linear-lasso-and-ridge-regression-with-r
-
+Depression
 ```{r}
 eval_results <- function(true, predicted, df) {
   SSE <- sum((predicted - true)^2)
@@ -455,148 +716,175 @@ eval_results(y_test, predictions_test, test)
 lasso_model$beta
 ```
 
-
-
 ```{r}
-colnames(train)
+plot(lasso_model$beta)
 ```
 
 
-GLM AND KNN
-
-k
-accuracy
-binary
-
+Anxiety
 ```{r}
-for (k in 1:1){
-  knn_fit <- knn3(depression~., data=train, k=k) 
-  p_hat_knn_train <- predict(knn_fit, train, type="prob")
-  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_train, factor(train$depression))
-  #print(k)
-  #print(confusionMatrix(y_hat_knn_train, factor(train$depression))$overall["Accuracy"])
-  
-  
-  p_hat_knn_test <- predict(knn_fit, test, type="prob")
-  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_test, factor(test$depression))
-  #print(confusionMatrix(y_hat_knn_test, factor(test$depression))$overall["Accuracy"])
-}
+dummies_train <- dummyVars(anxiety~ ., data = train)
+dummies_test <- dummyVars(anxiety~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
 
+x = as.matrix(train_dummies)
+y_train = train$anxiety
 
+x_test = as.matrix(test_dummies)
+y_test = test$anxiety
 
-for (k in 1:10){
-  knn_fit <- knn3(anxiety~., data=train, k=k) 
-  p_hat_knn_train <- predict(knn_fit, train, type="prob")
-  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_train, factor(train$anxiety))
-  #print(k)
-  #print(confusionMatrix(y_hat_knn_train, factor(train$anxiety))$overall["Accuracy"])
-  
-  
-  p_hat_knn_test <- predict(knn_fit, test, type="prob")
-  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_test, factor(test$anxiety))
-  #print(confusionMatrix(y_hat_knn_test, factor(test$anxiety))$overall["Accuracy"])
-}
-```
-
-
-??????????????????????WARNING
-```{r}
-df
 ```
 
 
 ```{r}
-train
-```
 
+lambdas <- 10^seq(2, -3, by = -.1)
 
-```{r}
-test
-```
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
 
-```{r}
-
-```
-
-```{r}
-head(train)
-```
-
-```{r}
-
-ks = c()
-train_accuracy = c()
-test_accuracy = c()
-binary_labels = c()
-
-for (i in 6:ncol(train)){
-  
-  colname <- colnames(train)[i]
-  if (colname == "treatment"){
-    next
-  }
-  
-  colnames(train)[i] <- "label"
-  colnames(test)[i] <- "label"
-  
-  print(colname)
-  
-  glm_1 <- glm(label~., data=train, family="binomial")
-  #predict(glm_1, train)
-  plot(glm_1)
-  
-  for (k in 1:10){
-    
-    knn_fit <- knn3(label~., data=train, k=k) 
-    p_hat_knn_train <- predict(knn_fit, train, type="prob")
-    y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-    confusionMatrix(y_hat_knn_train, factor(train$label))
-    #print(confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
-    
-    p_hat_knn_test <- predict(knn_fit, test, type="prob")
-    y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-    confusionMatrix(y_hat_knn_test, factor(test$label))
-    #print(confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
-    
-    ks <- c(ks, k)
-    train_accuracy <- c(train_accuracy, confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
-    test_accuracy <- c(test_accuracy, confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
-    binary_labels <- c(binary_labels, colname)
-  
-  }
-  
-  colnames(train)[i] <- colname
-  colnames(test)[i] <- colname
-}
-
-
-```
-
-
-
-```{r}
-
-binary_labels
-ks
-train_accuracy
-test_accuracy
-knn_dataframe <- data.frame(ks,train_accuracy,test_accuracy,binary_labels)
-knn_dataframe
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
 
 ```
 
 ```{r}
-ggplot(knn_dataframe, aes(x=ks)) +
-  geom_line(aes(y = train_accuracy), color = "red") + 
-  geom_line(aes(y = test_accuracy), color = "blue") +
-  facet_wrap(~binary_labels)
+plot(lasso_reg)
+```
+
+want smaller RMSE
+```{r}
+
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
+
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
+
+```
+
+```{r}
+lasso_model$beta
+```
+
+```{r}
+plot(lasso_model$beta)
 ```
 
 
+Panic attack
+```{r}
+dummies_train <- dummyVars(panic_attack~ ., data = train)
+dummies_test <- dummyVars(panic_attack~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
+
+x = as.matrix(train_dummies)
+y_train = train$panic_attack
+
+x_test = as.matrix(test_dummies)
+y_test = test$panic_attack
+
+```
+
+
+```{r}
+
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
+
+```
+
+```{r}
+plot(lasso_reg)
+```
+
+want smaller RMSE
+```{r}
+
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
+
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
+
+```
+
+```{r}
+lasso_model$beta
+```
+
+```{r}
+plot(lasso_model$beta)
+```
+
+
+
+Treatment
+```{r}
+dummies_train <- dummyVars(treatment~ ., data = train)
+dummies_test <- dummyVars(treatment~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
+
+x = as.matrix(train_dummies)
+y_train = train$treatment
+
+x_test = as.matrix(test_dummies)
+y_test = test$treatment
+
+```
+
+
+```{r}
+
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
+
+```
+
+```{r}
+plot(lasso_reg)
+```
+
+want smaller RMSE
+```{r}
+
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
+
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
+
+```
+
+```{r}
+lasso_model$beta
+```
+
+```{r}
+plot(lasso_model$beta)
+```
 
 
 

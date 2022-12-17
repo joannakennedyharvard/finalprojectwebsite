@@ -3,11 +3,6 @@ Final Project
 Joanna Kennedy
 2022-11-22
 
-WHEN BUILDING IT ON RSTUDIO NEED TO BUILD WEBSITE BEFOR EYOU PUSH TO GIT
-HUB
-
-histograms and scatterplots - min plot number dendrogram
-
 ``` r
 library(ggplot2)
 library(stringr)
@@ -225,11 +220,6 @@ apply(df, 2, unique)
     ## 
     ## $Did.you.seek.any.specialist.for.a.treatment.
     ## [1] "No"  "Yes"
-
-???????WHEN NUMBER OF YES IS SMALL SHOULD I SPLIT THE TRAIN AND TEST TO
-INCLUDE ALL YES IN BOTH TRAIN AND TEST (or some for even amount) -
-should I double dip –\> should I decrease the size of testing to get
-half and half and have all in training (OR 1/3)
 
 ``` r
 for (i in 1:ncol(df)){
@@ -515,14 +505,15 @@ ggplot(test, aes(x=grade,y=group_gpa, color=course)) +
 ![](Final-Project_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
-test <- df %>% group_by(grade,course) %>% dplyr::summarise(group_gpa=mean(gpa), count = n()) %>% filter(count>2)
+test <- df %>% group_by(grade,course) %>% dplyr::summarise(average_gpa=mean(gpa), count = n()) %>% filter(count>2)
 ```
 
     ## `summarise()` has grouped output by 'grade'. You can override using the
     ## `.groups` argument.
 
 ``` r
-ggplot(test, aes(grade, group_gpa)) + 
+ggplot(test, aes(grade, average_gpa)) + 
+  ggtitle("Trends in GPA by Course") +
   geom_jitter(aes(col=course)) + 
   geom_smooth(aes(col=course), method="lm", se=F)
 ```
@@ -644,147 +635,18 @@ chisq_test
     ## X-squared = 1.1868, df = 1, p-value = 0.276
 
 ``` r
-length(binary_colnames)
-```
-
-    ## [1] 6
-
-``` r
-length(binary)
-```
-
-    ## [1] 6
-
-``` r
-binary_colnames
-```
-
-    ## [1] "gender"       "married"      "depression"   "anxiety"      "panic_attack"
-    ## [6] "treatment"
-
-``` r
-ncol(binary)
-```
-
-    ## [1] 6
-
-``` r
-binary
-```
-
-    ##     gender married depression anxiety panic_attack treatment
-    ## 1   female      no        yes      no          yes        no
-    ## 2     male      no         no     yes           no        no
-    ## 3     male      no        yes     yes          yes        no
-    ## 4   female     yes        yes      no           no        no
-    ## 5     male      no         no      no           no        no
-    ## 6     male      no         no      no          yes        no
-    ## 7   female     yes        yes      no          yes        no
-    ## 8   female      no         no     yes           no        no
-    ## 9   female      no         no      no           no        no
-    ## 10    male      no         no     yes          yes        no
-    ## 11  female      no         no      no           no        no
-    ## 12  female     yes        yes      no           no        no
-    ## 13  female      no        yes      no           no        no
-    ## 14    male      no         no      no           no        no
-    ## 15  female      no         no     yes           no        no
-    ## 16    male      no         no      no           no        no
-    ## 17  female      no         no      no           no        no
-    ## 18  female     yes        yes     yes          yes        no
-    ## 19  female      no         no     yes           no        no
-    ## 20  female     yes        yes     yes          yes        no
-    ## 21  female      no         no      no          yes        no
-    ## 22  female      no         no      no           no        no
-    ## 23  female      no         no      no           no        no
-    ## 24  female      no         no      no           no        no
-    ## 25  female      no        yes     yes          yes        no
-    ## 26  female      no         no      no           no        no
-    ## 27  female      no         no      no           no        no
-    ## 28    male     yes        yes     yes           no        no
-    ## 29  female     yes        yes     yes          yes       yes
-    ## 30  female      no         no      no           no        no
-    ## 31  female      no         no      no           no        no
-    ## 32    male      no         no      no           no        no
-    ## 33    male      no         no      no          yes        no
-    ## 34    male     yes        yes     yes           no       yes
-    ## 35  female      no        yes     yes          yes        no
-    ## 36  female      no         no      no           no        no
-    ## 37  female      no        yes     yes           no        no
-    ## 38  female      no        yes     yes          yes        no
-    ## 39  female      no         no      no           no        no
-    ## 40  female     yes        yes      no          yes       yes
-    ## 41  female      no         no     yes           no        no
-    ## 42  female      no         no      no           no        no
-    ## 43  female      no        yes      no           no        no
-    ## 44    male      no         no      no          yes        no
-    ## 45    male      no         no     yes          yes        no
-    ## 46  female      no         no     yes           no        no
-    ## 47  female      no         no      no           no        no
-    ## 48    male      no        yes      no           no        no
-    ## 49  female      no         no      no          yes        no
-    ## 50  female     yes        yes      no          yes       yes
-    ## 51  female      no         no     yes           no        no
-    ## 52  female      no         no      no           no        no
-    ## 53  female     yes        yes     yes          yes        no
-    ## 54  female      no        yes      no          yes       yes
-    ## 55    male      no         no      no           no        no
-    ## 56    male      no         no      no           no        no
-    ## 57  female      no        yes     yes           no        no
-    ## 58  female      no         no      no           no        no
-    ## 59  female      no         no      no           no        no
-    ## 60  female      no         no      no          yes        no
-    ## 61  female      no         no      no           no        no
-    ## 62  female      no         no      no          yes        no
-    ## 63  female      no         no      no          yes        no
-    ## 64  female      no         no      no           no        no
-    ## 65  female      no        yes     yes           no        no
-    ## 66  female      no         no     yes           no        no
-    ## 67    male     yes        yes      no          yes        no
-    ## 68  female      no        yes      no           no        no
-    ## 69  female      no         no     yes           no        no
-    ## 70  female      no         no      no           no        no
-    ## 71  female      no         no      no          yes        no
-    ## 72  female     yes        yes      no           no        no
-    ## 73    male      no         no      no           no        no
-    ## 74    male      no         no     yes           no        no
-    ## 75  female      no         no     yes          yes        no
-    ## 76  female      no        yes      no           no        no
-    ## 77  female      no         no      no          yes        no
-    ## 78  female      no         no      no           no        no
-    ## 79  female      no         no      no           no        no
-    ## 80  female     yes        yes     yes          yes        no
-    ## 81  female      no         no      no           no        no
-    ## 82  female      no        yes     yes           no        no
-    ## 83  female      no         no      no           no        no
-    ## 84    male      no         no      no           no        no
-    ## 85  female      no        yes     yes           no       yes
-    ## 86  female      no         no      no           no        no
-    ## 87  female      no        yes     yes          yes        no
-    ## 88    male      no         no     yes           no        no
-    ## 89    male      no         no      no          yes        no
-    ## 90  female      no         no      no          yes        no
-    ## 91    male      no         no     yes           no        no
-    ## 92  female     yes        yes      no           no        no
-    ## 93  female      no        yes      no           no        no
-    ## 94  female      no         no      no          yes        no
-    ## 95  female      no         no      no           no        no
-    ## 96  female      no         no     yes           no        no
-    ## 97    male      no        yes     yes           no        no
-    ## 98  female     yes        yes      no          yes        no
-    ## 99  female      no         no      no           no        no
-    ## 100   male      no         no      no           no        no
-
-``` r
 association <- c()
+all <- c()
+pvs <- c()
 for(i in 1:(ncol(binary)-1)){
   for(j in (i+1):(ncol(binary))){
     if (i != j){
-      print(binary_colnames[i])
-      print(binary_colnames[j])
       test <- chisq.test(df[,i], df[,j])
-      print(test)
+      compare <- paste(binary_colnames[i], binary_colnames[j], sep = " vs. ")
+      all <- c(all,compare)
+      pvs <- c(pvs,test$p.value)
       if (test$p.value < 0.05) {
-        association <- c(association, paste(binary_colnames[i], binary_colnames[j], sep = " vs. "))
+        association <- c(association, compare)
       }
     }
     
@@ -792,185 +654,54 @@ for(i in 1:(ncol(binary)-1)){
 }
 ```
 
-    ## [1] "gender"
-    ## [1] "married"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 109.74, df = 39, p-value = 1.195e-08
-    ## 
-    ## [1] "gender"
-    ## [1] "depression"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 3.7347, df = 3, p-value = 0.2916
-    ## 
-    ## [1] "gender"
-    ## [1] "anxiety"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 20.909, df = 18, p-value = 0.284
-    ## 
-    ## [1] "gender"
-    ## [1] "panic_attack"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 100.63, df = 102, p-value = 0.5198
-    ## 
-    ## [1] "gender"
-    ## [1] "treatment"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 4.452, df = 9, p-value = 0.8792
-    ## 
-    ## [1] "married"
-    ## [1] "depression"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 14.835, df = 13, p-value = 0.3178
-    ## 
-    ## [1] "married"
-    ## [1] "anxiety"
+    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
+    ## incorrect
 
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 57.132, df = 78, p-value = 0.9636
-    ## 
-    ## [1] "married"
-    ## [1] "panic_attack"
-
     ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
     ## incorrect
 
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 488.61, df = 442, p-value = 0.06203
-    ## 
-    ## [1] "married"
-    ## [1] "treatment"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 27.248, df = 39, p-value = 0.9217
-    ## 
-    ## [1] "depression"
-    ## [1] "anxiety"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 4.0437, df = 6, p-value = 0.6708
-    ## 
-    ## [1] "depression"
-    ## [1] "panic_attack"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 30.519, df = 34, p-value = 0.639
-    ## 
-    ## [1] "depression"
-    ## [1] "treatment"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 5.9951, df = 3, p-value = 0.1118
-    ## 
-    ## [1] "anxiety"
-    ## [1] "panic_attack"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 193.62, df = 204, p-value = 0.6878
-    ## 
-    ## [1] "anxiety"
-    ## [1] "treatment"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 19.949, df = 18, p-value = 0.3357
-    ## 
-    ## [1] "panic_attack"
-    ## [1] "treatment"
-
-    ## Warning in chisq.test(df[, i], df[, j]): Chi-squared approximation may be
-    ## incorrect
-
-    ## 
-    ##  Pearson's Chi-squared test
-    ## 
-    ## data:  df[, i] and df[, j]
-    ## X-squared = 126.77, df = 102, p-value = 0.04878
+``` r
+chi_square_table <- data.frame(unlist(all),unlist(pvs))
+```
 
 ``` r
 association
@@ -978,16 +709,43 @@ association
 
     ## [1] "gender vs. married"         "panic_attack vs. treatment"
 
-Regression
+``` r
+colnames(chi_square_table) <- c("Comparison","P Value")
+chi_square_table
+```
+
+    ##                     Comparison      P Value
+    ## 1           gender vs. married 1.195221e-08
+    ## 2        gender vs. depression 2.915759e-01
+    ## 3           gender vs. anxiety 2.840283e-01
+    ## 4      gender vs. panic_attack 5.198498e-01
+    ## 5         gender vs. treatment 8.792311e-01
+    ## 6       married vs. depression 3.177692e-01
+    ## 7          married vs. anxiety 9.635715e-01
+    ## 8     married vs. panic_attack 6.203333e-02
+    ## 9        married vs. treatment 9.216927e-01
+    ## 10      depression vs. anxiety 6.707566e-01
+    ## 11 depression vs. panic_attack 6.390291e-01
+    ## 12    depression vs. treatment 1.118481e-01
+    ## 13    anxiety vs. panic_attack 6.878439e-01
+    ## 14       anxiety vs. treatment 3.356754e-01
+    ## 15  panic_attack vs. treatment 4.877638e-02
+
+Shapiro Wilk’s Test
 
 ``` r
+all <- c()
+normal <- c()
 non_normal_numerical = c()
 for (i in 1:ncol(numerical)){
   test <- shapiro.test(numerical[,i])
   print(test)
-  
-  if (test$p.value < 0.05)
+  all <- c(all,numerical_colnames[i])
+  if (test$p.value < 0.05){
     non_normal_numerical <- c(non_normal_numerical, numerical_colnames[i])
+    normal <- c(normal,FALSE)
+  }
+  normal <- c(normal,TRUE)
 }
 ```
 
@@ -1022,10 +780,30 @@ for (i in 1:ncol(numerical)){
     ## W = 0.69687, p-value = 4.562e-13
 
 ``` r
+shap_table <- data.frame(unlist(all),unlist(normal))
+colnames(shap_table) <- c("Variable","Normal")
+shap_table
+```
+
+    ##    Variable Normal
+    ## 1       day  FALSE
+    ## 2      hour   TRUE
+    ## 3       age  FALSE
+    ## 4     grade   TRUE
+    ## 5       gpa  FALSE
+    ## 6       day   TRUE
+    ## 7      hour  FALSE
+    ## 8       age   TRUE
+    ## 9     grade  FALSE
+    ## 10      gpa   TRUE
+
+``` r
 non_normal_numerical
 ```
 
     ## [1] "day"   "hour"  "age"   "grade" "gpa"
+
+Regression
 
 ``` r
 for(i in 1:(ncol(numerical)-1)) {
@@ -1043,228 +821,11 @@ for(i in 1:(ncol(numerical)-1)) {
 }
 ```
 
-![](Final-Project_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-2.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-3.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-4.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-5.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-6.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-7.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-8.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-9.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-10.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-11.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-12.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-13.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-14.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-15.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-16.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-17.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-18.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-19.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-20.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-21.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-22.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-23.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-24.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-25.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-26.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-27.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-28.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-29.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-30.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-31.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-32.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-33.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-34.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-35.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-36.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-37.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-38.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-39.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-40.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-41.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-42.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-43.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-44.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-45.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-46.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-47.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-48.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-49.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-50.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-51.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-52.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-53.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-54.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-55.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-56.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-57.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-58.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-59.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-60.png)<!-- -->
+![](Final-Project_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-2.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-3.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-4.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-5.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-6.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-7.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-8.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-9.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-10.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-11.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-12.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-13.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-14.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-15.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-16.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-17.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-18.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-19.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-20.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-21.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-22.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-23.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-24.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-25.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-26.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-27.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-28.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-29.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-30.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-31.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-32.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-33.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-34.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-35.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-36.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-37.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-38.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-39.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-40.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-41.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-42.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-43.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-44.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-45.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-46.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-47.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-48.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-49.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-50.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-51.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-52.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-53.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-54.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-55.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-56.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-57.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-58.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-59.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-29-60.png)<!-- -->
 
 I acknowledge gender as a categorical value rather than a binary value,
 but within the context of this datasets, students were categorized as
 either female or male.
-
-``` r
-df
-```
-
-    ##     day hour gender age                  course grade  gpa married depression
-    ## 1     8   12 female  18             engineering     9 3.49      no        yes
-    ## 2     8   12   male  21       islamic education    10 3.49      no         no
-    ## 3     8   12   male  19                     bit     9 3.49      no        yes
-    ## 4     8   12 female  22                    laws    11 3.49     yes        yes
-    ## 5     8   12   male  23            mathemathics    12 3.49      no         no
-    ## 6     8   13   male  19             engineering    10 4.00      no         no
-    ## 7     8   13 female  23        pendidikan islam    10 4.00     yes        yes
-    ## 8     8   13 female  18                     bcs     9 4.00      no         no
-    ## 9     8   13 female  19         human resources    10 2.99      no         no
-    ## 10    8   13   male  18                  kirkhs     9 4.00      no         no
-    ## 11    8   13 female  20              psychology     9 4.00      no         no
-    ## 12    8   13 female  24             engineering    11 4.00     yes        yes
-    ## 13    8   13 female  18                     bcs     9 3.49      no        yes
-    ## 14    8   13   male  19             engineering     9 3.49      no         no
-    ## 15    8   13 female  18                   kenms    10 4.00      no         no
-    ## 16    8   13   male  24                     bcs    11 4.00      no         no
-    ## 17    8   13 female  24              accounting    11 3.49      no         no
-    ## 18    8   13 female  24                     enm    12 3.49     yes        yes
-    ## 19    8   13 female  20                     bit    10 4.00      no         no
-    ## 20    8   13 female  18          marine science    10 4.00     yes        yes
-    ## 21    8   13 female  19             engineering     9 3.49      no         no
-    ## 22    8   13 female  18                     koe    10 3.49      no         no
-    ## 23    8   13 female  24                     bcs     9 4.00      no         no
-    ## 24    8   13 female  24             engineering     9 3.49      no         no
-    ## 25    8   13 female  23                     bcs    11 4.00      no        yes
-    ## 26    8   13 female  18         banking studies     9 4.00      no         no
-    ## 27    8   14 female  19             engineering     9 4.00      no         no
-    ## 28    8   14   male  18             engineering    10 3.49     yes        yes
-    ## 29    8   14 female  24                     bit    11 4.00     yes        yes
-    ## 30    8   14 female  24                     bcs    12 4.00      no         no
-    ## 31    8   14 female  23 business administration    10 3.49      no         no
-    ## 32    8   14   male  18                     bcs    10 3.49      no         no
-    ## 33    8   14   male  19                     bcs     9 4.00      no         no
-    ## 34    8   15   male  18                     bcs    10 4.00     yes        yes
-    ## 35    8   15 female  19                     bit     9 3.49      no        yes
-    ## 36    8   15 female  18             engineering     9 2.49      no         no
-    ## 37    8   15 female  18                    laws    11 3.49      no        yes
-    ## 38    8   15 female  19                     bit     9 2.99      no        yes
-    ## 39    8   15 female  18                  kirkhs     9 4.00      no         no
-    ## 40    8   15 female  24             engineering    10 2.99     yes        yes
-    ## 41    8   15 female  24                     bit    11 3.49      no         no
-    ## 42    8   15 female  22             engineering    12 4.00      no         no
-    ## 43    8   15 female  20               usuluddin    10 3.49      no        yes
-    ## 44    8   15   male  23                   taasl    10 4.00      no         no
-    ## 45    8   15   male  18                     bcs     9 4.00      no         no
-    ## 46    8   15 female  19             engineering     9 4.00      no         no
-    ## 47    8   15 female  18             engineering    12 4.00      no         no
-    ## 48    8   15   male  24                     bcs    10 3.49      no        yes
-    ## 49    8   15 female  24                     bcs    11 4.00      no         no
-    ## 50    8   15 female  23                     ala     9 2.99     yes        yes
-    ## 51    8   16 female  18                     bcs    10 4.00      no         no
-    ## 52    8   16 female  19      biomedical science    11 3.49      no         no
-    ## 53    8   16 female  20                     koe    11 3.49     yes        yes
-    ## 54    8   16 female  19                     bcs     9 4.00      no        yes
-    ## 55    8   16   male  21                     bcs     9 3.49      no         no
-    ## 56    8   16   male  23                  kirkhs    11 4.00      no         no
-    ## 57    8   16 female  20                    benl    11 3.49      no        yes
-    ## 58    8   16 female  18                     bcs     9 4.00      no         no
-    ## 59    8   17 female  23                    benl     9 3.49      no         no
-    ## 60    8   17 female  18                      it    11 3.49      no         no
-    ## 61    8   17 female  19                     bcs     9 4.00      no         no
-    ## 62    8   17 female  18                     cts     9 4.00      no         no
-    ## 63    8   18 female  24             engineering     9 4.00      no         no
-    ## 64    8   18 female  24             engineering     9 4.00      no         no
-    ## 65    8   18 female  23                   econs     9 4.00      no        yes
-    ## 66    8   18 female  18                     koe    11 3.49      no         no
-    ## 67    8   18   male  19                    mhsc    11 3.49     yes        yes
-    ## 68    8   19 female  18                  malcom     9 4.00      no        yes
-    ## 69    8   20 female  24                     kop    12 3.49      no         no
-    ## 70    8   21 female  24      biomedical science     9 3.49      no         no
-    ## 71    8   21 female  18                    laws    11 4.00      no         no
-    ## 72    8   23 female  19                     bit    11 3.49     yes        yes
-    ## 73    9    7   male  18      biomedical science     9 1.99      no         no
-    ## 74    9   12   male  24                     bit    11 4.00      no         no
-    ## 75    9   12 female  24                     koe     9 4.00      no         no
-    ## 76    9   13 female  23             engineering     9 3.49      no        yes
-    ## 77    9   18 female  18          human sciences    10 3.49      no         no
-    ## 78   13   10 female  19           biotechnology    11 1.99      no         no
-    ## 79   13   10 female  18             engineering    12 4.00      no         no
-    ## 80   13   10 female  24           communication    10 4.00     yes        yes
-    ## 81   13   10 female  24                 nursing    10 4.00      no         no
-    ## 82   13   10 female  19             engineering     9 3.49      no        yes
-    ## 83   13   10 female  19        pendidikan islam    10 3.49      no         no
-    ## 84   13   10   male  23             radiography     9 3.49      no         no
-    ## 85   13   11 female  18              psychology     9 4.00      no        yes
-    ## 86   13   11 female  19                    fiqh    11 3.49      no         no
-    ## 87   13   12 female  18              psychology     9 4.00      no        yes
-    ## 88   13   12   male  24                     bit     9 3.49      no         no
-    ## 89   13   12   male  24             engineering    10 2.49      no         no
-    ## 90   13   14 female  23            diploma tesl    11 4.00      no         no
-    ## 91   13   15   male  18                     koe    10 3.49      no         no
-    ## 92   13   15 female  19                     koe    10 3.49     yes        yes
-    ## 93   13   16 female  18                    benl     9 3.49      no        yes
-    ## 94   13   18 female  24                    fiqh    11 1.99      no         no
-    ## 95   13   19 female  18       islamic education     9 4.00      no         no
-    ## 96   13   20 female  21                     bcs     9 4.00      no         no
-    ## 97   13   21   male  18             engineering    10 3.49      no        yes
-    ## 98   13   21 female  19                 nursing    11 4.00     yes        yes
-    ## 99   13   21 female  23        pendidikan islam    12 4.00      no         no
-    ## 100  18   20   male  20      biomedical science    10 3.49      no         no
-    ##     anxiety panic_attack treatment
-    ## 1        no          yes        no
-    ## 2       yes           no        no
-    ## 3       yes          yes        no
-    ## 4        no           no        no
-    ## 5        no           no        no
-    ## 6        no          yes        no
-    ## 7        no          yes        no
-    ## 8       yes           no        no
-    ## 9        no           no        no
-    ## 10      yes          yes        no
-    ## 11       no           no        no
-    ## 12       no           no        no
-    ## 13       no           no        no
-    ## 14       no           no        no
-    ## 15      yes           no        no
-    ## 16       no           no        no
-    ## 17       no           no        no
-    ## 18      yes          yes        no
-    ## 19      yes           no        no
-    ## 20      yes          yes        no
-    ## 21       no          yes        no
-    ## 22       no           no        no
-    ## 23       no           no        no
-    ## 24       no           no        no
-    ## 25      yes          yes        no
-    ## 26       no           no        no
-    ## 27       no           no        no
-    ## 28      yes           no        no
-    ## 29      yes          yes       yes
-    ## 30       no           no        no
-    ## 31       no           no        no
-    ## 32       no           no        no
-    ## 33       no          yes        no
-    ## 34      yes           no       yes
-    ## 35      yes          yes        no
-    ## 36       no           no        no
-    ## 37      yes           no        no
-    ## 38      yes          yes        no
-    ## 39       no           no        no
-    ## 40       no          yes       yes
-    ## 41      yes           no        no
-    ## 42       no           no        no
-    ## 43       no           no        no
-    ## 44       no          yes        no
-    ## 45      yes          yes        no
-    ## 46      yes           no        no
-    ## 47       no           no        no
-    ## 48       no           no        no
-    ## 49       no          yes        no
-    ## 50       no          yes       yes
-    ## 51      yes           no        no
-    ## 52       no           no        no
-    ## 53      yes          yes        no
-    ## 54       no          yes       yes
-    ## 55       no           no        no
-    ## 56       no           no        no
-    ## 57      yes           no        no
-    ## 58       no           no        no
-    ## 59       no           no        no
-    ## 60       no          yes        no
-    ## 61       no           no        no
-    ## 62       no          yes        no
-    ## 63       no          yes        no
-    ## 64       no           no        no
-    ## 65      yes           no        no
-    ## 66      yes           no        no
-    ## 67       no          yes        no
-    ## 68       no           no        no
-    ## 69      yes           no        no
-    ## 70       no           no        no
-    ## 71       no          yes        no
-    ## 72       no           no        no
-    ## 73       no           no        no
-    ## 74      yes           no        no
-    ## 75      yes          yes        no
-    ## 76       no           no        no
-    ## 77       no          yes        no
-    ## 78       no           no        no
-    ## 79       no           no        no
-    ## 80      yes          yes        no
-    ## 81       no           no        no
-    ## 82      yes           no        no
-    ## 83       no           no        no
-    ## 84       no           no        no
-    ## 85      yes           no       yes
-    ## 86       no           no        no
-    ## 87      yes          yes        no
-    ## 88      yes           no        no
-    ## 89       no          yes        no
-    ## 90       no          yes        no
-    ## 91      yes           no        no
-    ## 92       no           no        no
-    ## 93       no           no        no
-    ## 94       no          yes        no
-    ## 95       no           no        no
-    ## 96      yes           no        no
-    ## 97      yes           no        no
-    ## 98       no          yes        no
-    ## 99       no           no        no
-    ## 100      no           no        no
-
-``` r
-head(train)
-```
-
-    ##                         
-    ## 1 function (x, ...)     
-    ## 2 {                     
-    ## 3     UseMethod("train")
-    ## 4 }
 
 ``` r
 #c("gender", "married", "depression", "anxiety", "panic_attack", "treatment", "engineering")
@@ -1303,219 +864,1098 @@ train
 ```
 
     ##     day hour age grade  gpa gender married depression anxiety panic_attack
+    ## 10    8   13  18     9 4.00      0       0          0       1            1
+    ## 31    8   14  23    10 3.49      1       0          0       0            0
+    ## 66    8   18  18    11 3.49      1       0          0       1            0
+    ## 70    8   21  24     9 3.49      1       0          0       0            0
+    ## 12    8   13  24    11 4.00      1       1          1       0            0
+    ## 87   13   12  18     9 4.00      1       0          1       1            1
+    ## 13    8   13  18     9 3.49      1       0          1       0            0
+    ## 74    9   12  24    11 4.00      0       0          0       1            0
+    ## 82   13   10  19     9 3.49      1       0          1       1            0
     ## 56    8   16  23    11 4.00      0       0          0       0            0
-    ## 76    9   13  23     9 3.49      1       0          1       0            0
-    ## 45    8   15  18     9 4.00      0       0          0       1            1
-    ## 47    8   15  18    12 4.00      1       0          0       0            0
-    ## 28    8   14  18    10 3.49      0       1          1       1            0
-    ## 36    8   15  18     9 2.49      1       0          0       0            0
-    ## 4     8   12  22    11 3.49      1       1          1       0            0
-    ## 17    8   13  24    11 3.49      1       0          0       0            0
-    ## 48    8   15  24    10 3.49      0       0          1       0            0
-    ## 81   13   10  24    10 4.00      1       0          0       0            0
-    ## 55    8   16  21     9 3.49      0       0          0       0            0
-    ## 1     8   12  18     9 3.49      1       0          1       0            1
-    ## 39    8   15  18     9 4.00      1       0          0       0            0
-    ## 35    8   15  19     9 3.49      1       0          1       1            1
-    ## 52    8   16  19    11 3.49      1       0          0       0            0
+    ## 99   13   21  23    12 4.00      1       0          0       0            0
     ## 21    8   13  19     9 3.49      1       0          0       0            1
-    ## 90   13   14  23    11 4.00      1       0          0       0            1
+    ## 40    8   15  24    10 2.99      1       1          1       0            1
+    ## 14    8   13  19     9 3.49      0       0          0       0            0
+    ## 64    8   18  24     9 4.00      1       0          0       0            0
+    ## 49    8   15  24    11 4.00      1       0          0       0            1
+    ## 4     8   12  22    11 3.49      1       1          1       0            0
+    ## 79   13   10  18    12 4.00      1       0          0       0            0
+    ## 54    8   16  19     9 4.00      1       0          1       0            1
+    ## 42    8   15  22    12 4.00      1       0          0       0            0
     ## 100  18   20  20    10 3.49      0       0          0       0            0
+    ## 95   13   19  18     9 4.00      1       0          0       0            0
+    ## 39    8   15  18     9 4.00      1       0          0       0            0
+    ## 37    8   15  18    11 3.49      1       0          1       1            0
+    ## 34    8   15  18    10 4.00      0       1          1       1            0
+    ## 52    8   16  19    11 3.49      1       0          0       0            0
+    ## 28    8   14  18    10 3.49      0       1          1       1            0
+    ## 29    8   14  24    11 4.00      1       1          1       1            1
+    ## 51    8   16  18    10 4.00      1       0          0       1            0
+    ## 73    9    7  18     9 1.99      0       0          0       0            0
+    ## 76    9   13  23     9 3.49      1       0          1       0            0
+    ## 77    9   18  18    10 3.49      1       0          0       0            1
+    ## 68    8   19  18     9 4.00      1       0          1       0            0
+    ## 23    8   13  24     9 4.00      1       0          0       0            0
+    ## 90   13   14  23    11 4.00      1       0          0       0            1
+    ## 43    8   15  20    10 3.49      1       0          1       0            0
+    ## 47    8   15  18    12 4.00      1       0          0       0            0
+    ## 19    8   13  20    10 4.00      1       0          0       1            0
+    ## 20    8   13  18    10 4.00      1       1          1       1            1
+    ## 30    8   14  24    12 4.00      1       0          0       0            0
+    ## 83   13   10  19    10 3.49      1       0          0       0            0
+    ## 2     8   12  21    10 3.49      0       0          0       1            0
+    ## 22    8   13  18    10 3.49      1       0          0       0            0
+    ## 84   13   10  23     9 3.49      0       0          0       0            0
+    ## 16    8   13  24    11 4.00      0       0          0       0            0
+    ## 69    8   20  24    12 3.49      1       0          0       1            0
+    ## 75    9   12  24     9 4.00      1       0          0       1            1
+    ## 38    8   15  19     9 2.99      1       0          1       1            1
+    ## 93   13   16  18     9 3.49      1       0          1       0            0
+    ## 15    8   13  18    10 4.00      1       0          0       1            0
+    ## 3     8   12  19     9 3.49      0       0          1       1            1
+    ## 18    8   13  24    12 3.49      1       1          1       1            1
+    ## 46    8   15  19     9 4.00      1       0          0       1            0
+    ## 36    8   15  18     9 2.49      1       0          0       0            0
+    ## 50    8   15  23     9 2.99      1       1          1       0            1
+    ## 65    8   18  23     9 4.00      1       0          1       1            0
     ## 58    8   16  18     9 4.00      1       0          0       0            0
     ## 57    8   16  20    11 3.49      1       0          1       1            0
-    ## 97   13   21  18    10 3.49      0       0          1       1            0
-    ## 75    9   12  24     9 4.00      1       0          0       1            1
-    ## 85   13   11  18     9 4.00      1       0          1       1            0
-    ## 49    8   15  24    11 4.00      1       0          0       0            1
-    ## 30    8   14  24    12 4.00      1       0          0       0            0
-    ## 98   13   21  19    11 4.00      1       1          1       0            1
-    ## 26    8   13  18     9 4.00      1       0          0       0            0
-    ## 32    8   14  18    10 3.49      0       0          0       0            0
-    ## 33    8   14  19     9 4.00      0       0          0       0            1
-    ## 34    8   15  18    10 4.00      0       1          1       1            0
-    ## 53    8   16  20    11 3.49      1       1          1       1            1
-    ## 3     8   12  19     9 3.49      0       0          1       1            1
-    ## 83   13   10  19    10 3.49      1       0          0       0            0
-    ## 18    8   13  24    12 3.49      1       1          1       1            1
-    ## 6     8   13  19    10 4.00      0       0          0       0            1
-    ## 12    8   13  24    11 4.00      1       1          1       0            0
-    ## 24    8   13  24     9 3.49      1       0          0       0            0
-    ## 69    8   20  24    12 3.49      1       0          0       1            0
-    ## 16    8   13  24    11 4.00      0       0          0       0            0
-    ## 65    8   18  23     9 4.00      1       0          1       1            0
-    ## 86   13   11  19    11 3.49      1       0          0       0            0
-    ## 66    8   18  18    11 3.49      1       0          0       1            0
-    ## 40    8   15  24    10 2.99      1       1          1       0            1
-    ## 77    9   18  18    10 3.49      1       0          0       0            1
-    ## 46    8   15  19     9 4.00      1       0          0       1            0
-    ## 87   13   12  18     9 4.00      1       0          1       1            1
-    ## 54    8   16  19     9 4.00      1       0          1       0            1
-    ## 95   13   19  18     9 4.00      1       0          0       0            0
-    ## 51    8   16  18    10 4.00      1       0          0       1            0
-    ## 11    8   13  20     9 4.00      1       0          0       0            0
-    ## 79   13   10  18    12 4.00      1       0          0       0            0
-    ## 60    8   17  18    11 3.49      1       0          0       0            1
-    ## 19    8   13  20    10 4.00      1       0          0       1            0
-    ## 14    8   13  19     9 3.49      0       0          0       0            0
-    ## 99   13   21  23    12 4.00      1       0          0       0            0
-    ## 27    8   14  19     9 4.00      1       0          0       0            0
-    ## 74    9   12  24    11 4.00      0       0          0       1            0
+    ## 48    8   15  24    10 3.49      0       0          1       0            0
     ## 88   13   12  24     9 3.49      0       0          0       1            0
-    ## 7     8   13  23    10 4.00      1       1          1       0            1
-    ## 68    8   19  18     9 4.00      1       0          1       0            0
-    ## 93   13   16  18     9 3.49      1       0          1       0            0
-    ## 63    8   18  24     9 4.00      1       0          0       0            1
-    ## 38    8   15  19     9 2.99      1       0          1       1            1
-    ## 22    8   13  18    10 3.49      1       0          0       0            0
-    ## 29    8   14  24    11 4.00      1       1          1       1            1
-    ## 62    8   17  18     9 4.00      1       0          0       0            1
     ## 5     8   12  23    12 3.49      0       0          0       0            0
+    ## 62    8   17  18     9 4.00      1       0          0       0            1
+    ## 85   13   11  18     9 4.00      1       0          1       1            0
+    ## 26    8   13  18     9 4.00      1       0          0       0            0
+    ## 17    8   13  24    11 3.49      1       0          0       0            0
+    ## 71    8   21  18    11 4.00      1       0          0       0            1
     ## 59    8   17  23     9 3.49      1       0          0       0            0
-    ## 2     8   12  21    10 3.49      0       0          0       1            0
-    ## 15    8   13  18    10 4.00      1       0          0       1            0
-    ## 50    8   15  23     9 2.99      1       1          1       0            1
-    ## 37    8   15  18    11 3.49      1       0          1       1            0
-    ## 73    9    7  18     9 1.99      0       0          0       0            0
-    ## 41    8   15  24    11 3.49      1       0          0       1            0
+    ## 6     8   13  19    10 4.00      0       0          0       0            1
+    ## 9     8   13  19    10 2.99      1       0          0       0            0
+    ## 80   13   10  24    10 4.00      1       1          1       1            1
+    ## 1     8   12  18     9 3.49      1       0          1       0            1
+    ## 94   13   18  24    11 1.99      1       0          0       0            1
     ## 8     8   13  18     9 4.00      1       0          0       1            0
+    ## 7     8   13  23    10 4.00      1       1          1       0            1
+    ## 86   13   11  19    11 3.49      1       0          0       0            0
+    ## 61    8   17  19     9 4.00      1       0          0       0            0
     ## 96   13   20  21     9 4.00      1       0          0       1            0
-    ## 78   13   10  19    11 1.99      1       0          0       0            0
-    ## 20    8   13  18    10 4.00      1       1          1       1            1
     ## 67    8   18  19    11 3.49      0       1          1       0            1
-    ## 82   13   10  19     9 3.49      1       0          1       1            0
+    ## 25    8   13  23    11 4.00      1       0          1       1            1
+    ## 63    8   18  24     9 4.00      1       0          0       0            1
     ##     treatment engineering bcs
+    ## 10          0           0   0
+    ## 31          0           0   0
+    ## 66          0           0   0
+    ## 70          0           0   0
+    ## 12          0           1   0
+    ## 87          0           0   0
+    ## 13          0           0   1
+    ## 74          0           0   0
+    ## 82          0           1   0
     ## 56          0           0   0
-    ## 76          0           1   0
-    ## 45          0           0   1
-    ## 47          0           1   0
-    ## 28          0           1   0
-    ## 36          0           1   0
-    ## 4           0           0   0
-    ## 17          0           0   0
-    ## 48          0           0   1
-    ## 81          0           0   0
-    ## 55          0           0   1
-    ## 1           0           1   0
-    ## 39          0           0   0
-    ## 35          0           0   0
-    ## 52          0           0   0
+    ## 99          0           0   0
     ## 21          0           1   0
-    ## 90          0           0   0
+    ## 40          1           1   0
+    ## 14          0           1   0
+    ## 64          0           1   0
+    ## 49          0           0   1
+    ## 4           0           0   0
+    ## 79          0           1   0
+    ## 54          1           0   1
+    ## 42          0           1   0
     ## 100         0           0   0
+    ## 95          0           0   0
+    ## 39          0           0   0
+    ## 37          0           0   0
+    ## 34          1           0   1
+    ## 52          0           0   0
+    ## 28          0           1   0
+    ## 29          1           0   0
+    ## 51          0           0   1
+    ## 73          0           0   0
+    ## 76          0           1   0
+    ## 77          0           0   0
+    ## 68          0           0   0
+    ## 23          0           0   1
+    ## 90          0           0   0
+    ## 43          0           0   0
+    ## 47          0           1   0
+    ## 19          0           0   0
+    ## 20          0           0   0
+    ## 30          0           0   1
+    ## 83          0           0   0
+    ## 2           0           0   0
+    ## 22          0           0   0
+    ## 84          0           0   0
+    ## 16          0           0   1
+    ## 69          0           0   0
+    ## 75          0           0   0
+    ## 38          0           0   0
+    ## 93          0           0   0
+    ## 15          0           0   0
+    ## 3           0           0   0
+    ## 18          0           0   0
+    ## 46          0           1   0
+    ## 36          0           1   0
+    ## 50          1           0   0
+    ## 65          0           0   0
     ## 58          0           0   1
     ## 57          0           0   0
-    ## 97          0           1   0
-    ## 75          0           0   0
-    ## 85          1           0   0
-    ## 49          0           0   1
-    ## 30          0           0   1
-    ## 98          0           0   0
-    ## 26          0           0   0
-    ## 32          0           0   1
-    ## 33          0           0   1
-    ## 34          1           0   1
-    ## 53          0           0   0
-    ## 3           0           0   0
-    ## 83          0           0   0
-    ## 18          0           0   0
-    ## 6           0           1   0
-    ## 12          0           1   0
-    ## 24          0           1   0
-    ## 69          0           0   0
-    ## 16          0           0   1
-    ## 65          0           0   0
-    ## 86          0           0   0
-    ## 66          0           0   0
-    ## 40          1           1   0
-    ## 77          0           0   0
-    ## 46          0           1   0
-    ## 87          0           0   0
-    ## 54          1           0   1
-    ## 95          0           0   0
-    ## 51          0           0   1
-    ## 11          0           0   0
-    ## 79          0           1   0
-    ## 60          0           0   0
-    ## 19          0           0   0
-    ## 14          0           1   0
-    ## 99          0           0   0
-    ## 27          0           1   0
-    ## 74          0           0   0
+    ## 48          0           0   1
     ## 88          0           0   0
-    ## 7           0           0   0
-    ## 68          0           0   0
-    ## 93          0           0   0
-    ## 63          0           1   0
-    ## 38          0           0   0
-    ## 22          0           0   0
-    ## 29          1           0   0
-    ## 62          0           0   0
     ## 5           0           0   0
+    ## 62          0           0   0
+    ## 85          1           0   0
+    ## 26          0           0   0
+    ## 17          0           0   0
+    ## 71          0           0   0
     ## 59          0           0   0
-    ## 2           0           0   0
-    ## 15          0           0   0
-    ## 50          1           0   0
-    ## 37          0           0   0
-    ## 73          0           0   0
-    ## 41          0           0   0
+    ## 6           0           1   0
+    ## 9           0           0   0
+    ## 80          0           0   0
+    ## 1           0           1   0
+    ## 94          0           0   0
     ## 8           0           0   1
+    ## 7           0           0   0
+    ## 86          0           0   0
+    ## 61          0           0   1
     ## 96          0           0   1
-    ## 78          0           0   0
-    ## 20          0           0   0
     ## 67          0           0   0
-    ## 82          0           1   0
+    ## 25          0           0   1
+    ## 63          0           1   0
 
 ``` r
 test
 ```
 
     ##    day hour age grade  gpa gender married depression anxiety panic_attack
-    ## 9    8   13  19    10 2.99      1       0          0       0            0
-    ## 10   8   13  18     9 4.00      0       0          0       1            1
-    ## 13   8   13  18     9 3.49      1       0          1       0            0
-    ## 23   8   13  24     9 4.00      1       0          0       0            0
-    ## 25   8   13  23    11 4.00      1       0          1       1            1
-    ## 31   8   14  23    10 3.49      1       0          0       0            0
-    ## 42   8   15  22    12 4.00      1       0          0       0            0
-    ## 43   8   15  20    10 3.49      1       0          1       0            0
+    ## 11   8   13  20     9 4.00      1       0          0       0            0
+    ## 24   8   13  24     9 3.49      1       0          0       0            0
+    ## 27   8   14  19     9 4.00      1       0          0       0            0
+    ## 32   8   14  18    10 3.49      0       0          0       0            0
+    ## 33   8   14  19     9 4.00      0       0          0       0            1
+    ## 35   8   15  19     9 3.49      1       0          1       1            1
+    ## 41   8   15  24    11 3.49      1       0          0       1            0
     ## 44   8   15  23    10 4.00      0       0          0       0            1
-    ## 61   8   17  19     9 4.00      1       0          0       0            0
-    ## 64   8   18  24     9 4.00      1       0          0       0            0
-    ## 70   8   21  24     9 3.49      1       0          0       0            0
-    ## 71   8   21  18    11 4.00      1       0          0       0            1
+    ## 45   8   15  18     9 4.00      0       0          0       1            1
+    ## 53   8   16  20    11 3.49      1       1          1       1            1
+    ## 55   8   16  21     9 3.49      0       0          0       0            0
+    ## 60   8   17  18    11 3.49      1       0          0       0            1
     ## 72   8   23  19    11 3.49      1       1          1       0            0
-    ## 80  13   10  24    10 4.00      1       1          1       1            1
-    ## 84  13   10  23     9 3.49      0       0          0       0            0
+    ## 78  13   10  19    11 1.99      1       0          0       0            0
+    ## 81  13   10  24    10 4.00      1       0          0       0            0
     ## 89  13   12  24    10 2.49      0       0          0       0            1
     ## 91  13   15  18    10 3.49      0       0          0       1            0
     ## 92  13   15  19    10 3.49      1       1          1       0            0
-    ## 94  13   18  24    11 1.99      1       0          0       0            1
+    ## 97  13   21  18    10 3.49      0       0          1       1            0
+    ## 98  13   21  19    11 4.00      1       1          1       0            1
     ##    treatment engineering bcs
-    ## 9          0           0   0
-    ## 10         0           0   0
-    ## 13         0           0   1
-    ## 23         0           0   1
-    ## 25         0           0   1
-    ## 31         0           0   0
-    ## 42         0           1   0
-    ## 43         0           0   0
+    ## 11         0           0   0
+    ## 24         0           1   0
+    ## 27         0           1   0
+    ## 32         0           0   1
+    ## 33         0           0   1
+    ## 35         0           0   0
+    ## 41         0           0   0
     ## 44         0           0   0
-    ## 61         0           0   1
-    ## 64         0           1   0
-    ## 70         0           0   0
-    ## 71         0           0   0
+    ## 45         0           0   1
+    ## 53         0           0   0
+    ## 55         0           0   1
+    ## 60         0           0   0
     ## 72         0           0   0
-    ## 80         0           0   0
-    ## 84         0           0   0
+    ## 78         0           0   0
+    ## 81         0           0   0
     ## 89         0           1   0
     ## 91         0           0   0
     ## 92         0           0   0
-    ## 94         0           0   0
+    ## 97         0           1   0
+    ## 98         0           0   0
+
+GLM AND KNN
+
+``` r
+for (k in 1:1){
+  knn_fit <- knn3(depression~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$depression))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$depression))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$depression))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$depression))$overall["Accuracy"])
+}
+
+
+
+for (k in 1:10){
+  knn_fit <- knn3(anxiety~., data=train, k=k) 
+  p_hat_knn_train <- predict(knn_fit, train, type="prob")
+  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_train, factor(train$anxiety))
+  #print(k)
+  #print(confusionMatrix(y_hat_knn_train, factor(train$anxiety))$overall["Accuracy"])
+  
+  
+  p_hat_knn_test <- predict(knn_fit, test, type="prob")
+  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+  confusionMatrix(y_hat_knn_test, factor(test$anxiety))
+  #print(confusionMatrix(y_hat_knn_test, factor(test$anxiety))$overall["Accuracy"])
+}
+```
+
+``` r
+ks = c()
+train_accuracy = c()
+test_accuracy = c()
+binary_labels = c()
+
+for (i in 6:ncol(train)){
+  
+  colname <- colnames(train)[i]
+  if (colname == "treatment"){
+    next
+  }
+  
+  colnames(train)[i] <- "label"
+  colnames(test)[i] <- "label"
+  
+  print(colname)
+  
+  glm_1 <- glm(label~., data=train, family="binomial")
+  #predict(glm_1, train)
+  plot(glm_1)
+  
+  for (k in 1:15){
+    
+    knn_fit <- knn3(label~., data=train, k=k) 
+    p_hat_knn_train <- predict(knn_fit, train, type="prob")
+    y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_train, factor(train$label))
+    #print(confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    
+    p_hat_knn_test <- predict(knn_fit, test, type="prob")
+    y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+    confusionMatrix(y_hat_knn_test, factor(test$label))
+    #print(confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    
+    ks <- c(ks, k)
+    train_accuracy <- c(train_accuracy, confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
+    test_accuracy <- c(test_accuracy, confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
+    binary_labels <- c(binary_labels, colname)
+  
+  }
+  
+  colnames(train)[i] <- colname
+  colnames(test)[i] <- colname
+}
+```
+
+    ## [1] "gender"
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-2.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-3.png)<!-- -->
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## [1] "married"
+
+    ## Warning: glm.fit: algorithm did not converge
+
+    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-4.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-5.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-6.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-7.png)<!-- -->
+
+    ## Warning in sqrt(crit * p * (1 - hh)/hh): NaNs produced
+
+    ## Warning in sqrt(crit * p * (1 - hh)/hh): NaNs produced
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## [1] "depression"
+
+    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-8.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-9.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-10.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-11.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-12.png)<!-- -->
+
+    ## [1] "anxiety"
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-13.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-14.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-15.png)<!-- -->
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-16.png)<!-- -->
+
+    ## [1] "panic_attack"
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-17.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-18.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-19.png)<!-- -->
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-20.png)<!-- -->
+
+    ## [1] "engineering"
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-21.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-22.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-23.png)<!-- -->
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-24.png)<!-- -->
+
+    ## [1] "bcs"
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-25.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-26.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-32-27.png)<!-- -->
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-32-28.png)<!-- -->
+
+``` r
+knn_dataframe <- data.frame(ks,train_accuracy,test_accuracy,binary_labels)
+```
+
+``` r
+ggplot(knn_dataframe, aes(x=ks)) +
+  geom_line(aes(y = train_accuracy), color = "red") + 
+  geom_line(aes(y = test_accuracy), color = "blue") +
+  facet_wrap(~binary_labels)
+```
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+
+``` r
+value <- c("Depression","Anxiety","Panic Attack","Gender","Married","BCS","Engineering")
+accuracy <- c()
+pvs <- c()
+sensitivity <- c()
+specificity <- c()
+baccuracy <- c()
+```
+
+Depression
+
+``` r
+knn_fit <- knn3(depression~., data=train, k=7) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$depression))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$depression))
+cm
+```
+
+    ## Confusion Matrix and Statistics
+    ## 
+    ##           Reference
+    ## Prediction  0  1
+    ##          0 12  5
+    ##          1  2  1
+    ##                                           
+    ##                Accuracy : 0.65            
+    ##                  95% CI : (0.4078, 0.8461)
+    ##     No Information Rate : 0.7             
+    ##     P-Value [Acc > NIR] : 0.7723          
+    ##                                           
+    ##                   Kappa : 0.0278          
+    ##                                           
+    ##  Mcnemar's Test P-Value : 0.4497          
+    ##                                           
+    ##             Sensitivity : 0.8571          
+    ##             Specificity : 0.1667          
+    ##          Pos Pred Value : 0.7059          
+    ##          Neg Pred Value : 0.3333          
+    ##              Prevalence : 0.7000          
+    ##          Detection Rate : 0.6000          
+    ##    Detection Prevalence : 0.8500          
+    ##       Balanced Accuracy : 0.5119          
+    ##                                           
+    ##        'Positive' Class : 0               
+    ## 
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Anxiety
+
+``` r
+knn_fit <- knn3(anxiety~., data=train, k=2) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$anxiety))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$anxiety))
+```
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Panic Attack
+
+``` r
+knn_fit <- knn3(panic_attack~., data=train, k=5) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$panic_attack))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$panic_attack))
+```
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Treatment - not enough people in treatment so 0 people in the test set
+
+``` r
+knn_fit <- knn3(treatment~., data=train, k=k) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$treatment))
+```
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$treatment)):
+    ## Levels are not in the same order for reference and data. Refactoring data to
+    ## match.
+
+``` r
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+#cm <- confusionMatrix(y_hat_knn_test, factor(test$treatment))
+```
+
+Gender
+
+``` r
+knn_fit <- knn3(gender~., data=train, k=9) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$gender))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$gender))
+```
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$gender)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Married
+
+``` r
+knn_fit <- knn3(married~., data=train, k=3) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$married))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$married))
+```
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$married)): Levels
+    ## are not in the same order for reference and data. Refactoring data to match.
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+BCS
+
+``` r
+knn_fit <- knn3(bcs~., data=train, k=4) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$bcs))
+
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$bcs))
+```
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+Engineering
+
+``` r
+knn_fit <- knn3(engineering~., data=train, k=9) 
+p_hat_knn_train <- predict(knn_fit, train, type="prob")
+y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
+cm_train <- confusionMatrix(y_hat_knn_train, factor(train$engineering))
+```
+
+    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$engineering)):
+    ## Levels are not in the same order for reference and data. Refactoring data to
+    ## match.
+
+``` r
+p_hat_knn_test <- predict(knn_fit, test, type="prob")
+y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
+cm <- confusionMatrix(y_hat_knn_test, factor(test$engineering))
+```
+
+    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$engineering)):
+    ## Levels are not in the same order for reference and data. Refactoring data to
+    ## match.
+
+``` r
+accuracy <- c(accuracy,cm$overall[1] )
+pvs <- c(pvs,cm$overall[6])
+sensitivity <- c(sensitivity,cm$byClass[1])
+specificity <- c(specificity,cm$byClass[2])
+baccuracy <- c(baccuracy,cm$byClass[11])
+```
+
+``` r
+ks <- c(7,2,5,9,3,4,9)
+data.frame(Variable=value, K=ks,Accuracy=accuracy, P_Value=pvs, Sensitivity=sensitivity, Specificity=specificity, Balance_Accuracy=baccuracy)
+```
+
+    ##       Variable K Accuracy   P_Value Sensitivity Specificity Balance_Accuracy
+    ## 1   Depression 7     0.65 0.7722718   0.8571429   0.1666667        0.5119048
+    ## 2      Anxiety 2     0.60 0.8866685   0.8571429   0.0000000        0.4285714
+    ## 3 Panic Attack 5     0.50 0.8724788   0.8333333   0.0000000        0.4166667
+    ## 4       Gender 9     0.60 0.5955987   0.0000000   1.0000000        0.5000000
+    ## 5      Married 3     0.80 0.6296483   1.0000000   0.0000000        0.5000000
+    ## 6          BCS 4     0.75 0.8042078   0.9375000   0.0000000        0.4687500
+    ## 7  Engineering 9     0.80 0.6296483   1.0000000   0.0000000        0.5000000
 
 Lasso Regression
 
-source:
-<https://www.pluralsight.com/guides/linear-lasso-and-ridge-regression-with-r>
+Depression
 
 ``` r
 eval_results <- function(true, predicted, df) {
@@ -1564,7 +2004,7 @@ lambda_best
 plot(lasso_reg)
 ```
 
-![](Final-Project_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](Final-Project_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
 
 want smaller RMSE
 
@@ -1576,7 +2016,7 @@ eval_results(y_train, predictions_train, train)
 ```
 
     ##        RMSE   Rsquare
-    ## 1 0.3685567 0.4122125
+    ## 1 0.3840126 0.3618794
 
 ``` r
 predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
@@ -1584,7 +2024,7 @@ eval_results(y_test, predictions_test, test)
 ```
 
     ##        RMSE   Rsquare
-    ## 1 0.3608508 0.3799366
+    ## 1 0.3171511 0.5210246
 
 ``` r
 lasso_model$beta
@@ -1595,908 +2035,255 @@ lasso_model$beta
     ## day           .         
     ## hour          .         
     ## age           .         
-    ## grade        -0.02481326
+    ## grade        -0.02147255
     ## gpa           .         
     ## gender        .         
-    ## married       0.57386740
-    ## anxiety       0.12685143
-    ## panic_attack  0.03007372
-    ## treatment     0.14926646
+    ## married       0.54752979
+    ## anxiety       0.09618754
+    ## panic_attack  0.01430415
+    ## treatment     0.16455691
     ## engineering   .         
     ## bcs           .
 
 ``` r
-colnames(train)
+plot(lasso_model$beta)
 ```
 
-    ##  [1] "day"          "hour"         "age"          "grade"        "gpa"         
-    ##  [6] "gender"       "married"      "depression"   "anxiety"      "panic_attack"
-    ## [11] "treatment"    "engineering"  "bcs"
+![](Final-Project_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
 
-GLM AND KNN
-
-k accuracy binary
+Anxiety
 
 ``` r
-for (k in 1:1){
-  knn_fit <- knn3(depression~., data=train, k=k) 
-  p_hat_knn_train <- predict(knn_fit, train, type="prob")
-  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_train, factor(train$depression))
-  #print(k)
-  #print(confusionMatrix(y_hat_knn_train, factor(train$depression))$overall["Accuracy"])
-  
-  
-  p_hat_knn_test <- predict(knn_fit, test, type="prob")
-  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_test, factor(test$depression))
-  #print(confusionMatrix(y_hat_knn_test, factor(test$depression))$overall["Accuracy"])
-}
+dummies_train <- dummyVars(anxiety~ ., data = train)
+dummies_test <- dummyVars(anxiety~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
 
+x = as.matrix(train_dummies)
+y_train = train$anxiety
 
-
-for (k in 1:10){
-  knn_fit <- knn3(anxiety~., data=train, k=k) 
-  p_hat_knn_train <- predict(knn_fit, train, type="prob")
-  y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_train, factor(train$anxiety))
-  #print(k)
-  #print(confusionMatrix(y_hat_knn_train, factor(train$anxiety))$overall["Accuracy"])
-  
-  
-  p_hat_knn_test <- predict(knn_fit, test, type="prob")
-  y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-  confusionMatrix(y_hat_knn_test, factor(test$anxiety))
-  #print(confusionMatrix(y_hat_knn_test, factor(test$anxiety))$overall["Accuracy"])
-}
+x_test = as.matrix(test_dummies)
+y_test = test$anxiety
 ```
-
-??????????????????????WARNING
 
 ``` r
-df
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
 ```
 
-    ##     day hour gender age                  course grade  gpa married depression
-    ## 1     8   12 female  18             engineering     9 3.49      no        yes
-    ## 2     8   12   male  21       islamic education    10 3.49      no         no
-    ## 3     8   12   male  19                     bit     9 3.49      no        yes
-    ## 4     8   12 female  22                    laws    11 3.49     yes        yes
-    ## 5     8   12   male  23            mathemathics    12 3.49      no         no
-    ## 6     8   13   male  19             engineering    10 4.00      no         no
-    ## 7     8   13 female  23        pendidikan islam    10 4.00     yes        yes
-    ## 8     8   13 female  18                     bcs     9 4.00      no         no
-    ## 9     8   13 female  19         human resources    10 2.99      no         no
-    ## 10    8   13   male  18                  kirkhs     9 4.00      no         no
-    ## 11    8   13 female  20              psychology     9 4.00      no         no
-    ## 12    8   13 female  24             engineering    11 4.00     yes        yes
-    ## 13    8   13 female  18                     bcs     9 3.49      no        yes
-    ## 14    8   13   male  19             engineering     9 3.49      no         no
-    ## 15    8   13 female  18                   kenms    10 4.00      no         no
-    ## 16    8   13   male  24                     bcs    11 4.00      no         no
-    ## 17    8   13 female  24              accounting    11 3.49      no         no
-    ## 18    8   13 female  24                     enm    12 3.49     yes        yes
-    ## 19    8   13 female  20                     bit    10 4.00      no         no
-    ## 20    8   13 female  18          marine science    10 4.00     yes        yes
-    ## 21    8   13 female  19             engineering     9 3.49      no         no
-    ## 22    8   13 female  18                     koe    10 3.49      no         no
-    ## 23    8   13 female  24                     bcs     9 4.00      no         no
-    ## 24    8   13 female  24             engineering     9 3.49      no         no
-    ## 25    8   13 female  23                     bcs    11 4.00      no        yes
-    ## 26    8   13 female  18         banking studies     9 4.00      no         no
-    ## 27    8   14 female  19             engineering     9 4.00      no         no
-    ## 28    8   14   male  18             engineering    10 3.49     yes        yes
-    ## 29    8   14 female  24                     bit    11 4.00     yes        yes
-    ## 30    8   14 female  24                     bcs    12 4.00      no         no
-    ## 31    8   14 female  23 business administration    10 3.49      no         no
-    ## 32    8   14   male  18                     bcs    10 3.49      no         no
-    ## 33    8   14   male  19                     bcs     9 4.00      no         no
-    ## 34    8   15   male  18                     bcs    10 4.00     yes        yes
-    ## 35    8   15 female  19                     bit     9 3.49      no        yes
-    ## 36    8   15 female  18             engineering     9 2.49      no         no
-    ## 37    8   15 female  18                    laws    11 3.49      no        yes
-    ## 38    8   15 female  19                     bit     9 2.99      no        yes
-    ## 39    8   15 female  18                  kirkhs     9 4.00      no         no
-    ## 40    8   15 female  24             engineering    10 2.99     yes        yes
-    ## 41    8   15 female  24                     bit    11 3.49      no         no
-    ## 42    8   15 female  22             engineering    12 4.00      no         no
-    ## 43    8   15 female  20               usuluddin    10 3.49      no        yes
-    ## 44    8   15   male  23                   taasl    10 4.00      no         no
-    ## 45    8   15   male  18                     bcs     9 4.00      no         no
-    ## 46    8   15 female  19             engineering     9 4.00      no         no
-    ## 47    8   15 female  18             engineering    12 4.00      no         no
-    ## 48    8   15   male  24                     bcs    10 3.49      no        yes
-    ## 49    8   15 female  24                     bcs    11 4.00      no         no
-    ## 50    8   15 female  23                     ala     9 2.99     yes        yes
-    ## 51    8   16 female  18                     bcs    10 4.00      no         no
-    ## 52    8   16 female  19      biomedical science    11 3.49      no         no
-    ## 53    8   16 female  20                     koe    11 3.49     yes        yes
-    ## 54    8   16 female  19                     bcs     9 4.00      no        yes
-    ## 55    8   16   male  21                     bcs     9 3.49      no         no
-    ## 56    8   16   male  23                  kirkhs    11 4.00      no         no
-    ## 57    8   16 female  20                    benl    11 3.49      no        yes
-    ## 58    8   16 female  18                     bcs     9 4.00      no         no
-    ## 59    8   17 female  23                    benl     9 3.49      no         no
-    ## 60    8   17 female  18                      it    11 3.49      no         no
-    ## 61    8   17 female  19                     bcs     9 4.00      no         no
-    ## 62    8   17 female  18                     cts     9 4.00      no         no
-    ## 63    8   18 female  24             engineering     9 4.00      no         no
-    ## 64    8   18 female  24             engineering     9 4.00      no         no
-    ## 65    8   18 female  23                   econs     9 4.00      no        yes
-    ## 66    8   18 female  18                     koe    11 3.49      no         no
-    ## 67    8   18   male  19                    mhsc    11 3.49     yes        yes
-    ## 68    8   19 female  18                  malcom     9 4.00      no        yes
-    ## 69    8   20 female  24                     kop    12 3.49      no         no
-    ## 70    8   21 female  24      biomedical science     9 3.49      no         no
-    ## 71    8   21 female  18                    laws    11 4.00      no         no
-    ## 72    8   23 female  19                     bit    11 3.49     yes        yes
-    ## 73    9    7   male  18      biomedical science     9 1.99      no         no
-    ## 74    9   12   male  24                     bit    11 4.00      no         no
-    ## 75    9   12 female  24                     koe     9 4.00      no         no
-    ## 76    9   13 female  23             engineering     9 3.49      no        yes
-    ## 77    9   18 female  18          human sciences    10 3.49      no         no
-    ## 78   13   10 female  19           biotechnology    11 1.99      no         no
-    ## 79   13   10 female  18             engineering    12 4.00      no         no
-    ## 80   13   10 female  24           communication    10 4.00     yes        yes
-    ## 81   13   10 female  24                 nursing    10 4.00      no         no
-    ## 82   13   10 female  19             engineering     9 3.49      no        yes
-    ## 83   13   10 female  19        pendidikan islam    10 3.49      no         no
-    ## 84   13   10   male  23             radiography     9 3.49      no         no
-    ## 85   13   11 female  18              psychology     9 4.00      no        yes
-    ## 86   13   11 female  19                    fiqh    11 3.49      no         no
-    ## 87   13   12 female  18              psychology     9 4.00      no        yes
-    ## 88   13   12   male  24                     bit     9 3.49      no         no
-    ## 89   13   12   male  24             engineering    10 2.49      no         no
-    ## 90   13   14 female  23            diploma tesl    11 4.00      no         no
-    ## 91   13   15   male  18                     koe    10 3.49      no         no
-    ## 92   13   15 female  19                     koe    10 3.49     yes        yes
-    ## 93   13   16 female  18                    benl     9 3.49      no        yes
-    ## 94   13   18 female  24                    fiqh    11 1.99      no         no
-    ## 95   13   19 female  18       islamic education     9 4.00      no         no
-    ## 96   13   20 female  21                     bcs     9 4.00      no         no
-    ## 97   13   21   male  18             engineering    10 3.49      no        yes
-    ## 98   13   21 female  19                 nursing    11 4.00     yes        yes
-    ## 99   13   21 female  23        pendidikan islam    12 4.00      no         no
-    ## 100  18   20   male  20      biomedical science    10 3.49      no         no
-    ##     anxiety panic_attack treatment
-    ## 1        no          yes        no
-    ## 2       yes           no        no
-    ## 3       yes          yes        no
-    ## 4        no           no        no
-    ## 5        no           no        no
-    ## 6        no          yes        no
-    ## 7        no          yes        no
-    ## 8       yes           no        no
-    ## 9        no           no        no
-    ## 10      yes          yes        no
-    ## 11       no           no        no
-    ## 12       no           no        no
-    ## 13       no           no        no
-    ## 14       no           no        no
-    ## 15      yes           no        no
-    ## 16       no           no        no
-    ## 17       no           no        no
-    ## 18      yes          yes        no
-    ## 19      yes           no        no
-    ## 20      yes          yes        no
-    ## 21       no          yes        no
-    ## 22       no           no        no
-    ## 23       no           no        no
-    ## 24       no           no        no
-    ## 25      yes          yes        no
-    ## 26       no           no        no
-    ## 27       no           no        no
-    ## 28      yes           no        no
-    ## 29      yes          yes       yes
-    ## 30       no           no        no
-    ## 31       no           no        no
-    ## 32       no           no        no
-    ## 33       no          yes        no
-    ## 34      yes           no       yes
-    ## 35      yes          yes        no
-    ## 36       no           no        no
-    ## 37      yes           no        no
-    ## 38      yes          yes        no
-    ## 39       no           no        no
-    ## 40       no          yes       yes
-    ## 41      yes           no        no
-    ## 42       no           no        no
-    ## 43       no           no        no
-    ## 44       no          yes        no
-    ## 45      yes          yes        no
-    ## 46      yes           no        no
-    ## 47       no           no        no
-    ## 48       no           no        no
-    ## 49       no          yes        no
-    ## 50       no          yes       yes
-    ## 51      yes           no        no
-    ## 52       no           no        no
-    ## 53      yes          yes        no
-    ## 54       no          yes       yes
-    ## 55       no           no        no
-    ## 56       no           no        no
-    ## 57      yes           no        no
-    ## 58       no           no        no
-    ## 59       no           no        no
-    ## 60       no          yes        no
-    ## 61       no           no        no
-    ## 62       no          yes        no
-    ## 63       no          yes        no
-    ## 64       no           no        no
-    ## 65      yes           no        no
-    ## 66      yes           no        no
-    ## 67       no          yes        no
-    ## 68       no           no        no
-    ## 69      yes           no        no
-    ## 70       no           no        no
-    ## 71       no          yes        no
-    ## 72       no           no        no
-    ## 73       no           no        no
-    ## 74      yes           no        no
-    ## 75      yes          yes        no
-    ## 76       no           no        no
-    ## 77       no          yes        no
-    ## 78       no           no        no
-    ## 79       no           no        no
-    ## 80      yes          yes        no
-    ## 81       no           no        no
-    ## 82      yes           no        no
-    ## 83       no           no        no
-    ## 84       no           no        no
-    ## 85      yes           no       yes
-    ## 86       no           no        no
-    ## 87      yes          yes        no
-    ## 88      yes           no        no
-    ## 89       no          yes        no
-    ## 90       no          yes        no
-    ## 91      yes           no        no
-    ## 92       no           no        no
-    ## 93       no           no        no
-    ## 94       no          yes        no
-    ## 95       no           no        no
-    ## 96      yes           no        no
-    ## 97      yes           no        no
-    ## 98       no          yes        no
-    ## 99       no           no        no
-    ## 100      no           no        no
+    ## [1] 0.03981072
 
 ``` r
-train
+plot(lasso_reg)
 ```
 
-    ##     day hour age grade  gpa gender married depression anxiety panic_attack
-    ## 56    8   16  23    11 4.00      0       0          0       0            0
-    ## 76    9   13  23     9 3.49      1       0          1       0            0
-    ## 45    8   15  18     9 4.00      0       0          0       1            1
-    ## 47    8   15  18    12 4.00      1       0          0       0            0
-    ## 28    8   14  18    10 3.49      0       1          1       1            0
-    ## 36    8   15  18     9 2.49      1       0          0       0            0
-    ## 4     8   12  22    11 3.49      1       1          1       0            0
-    ## 17    8   13  24    11 3.49      1       0          0       0            0
-    ## 48    8   15  24    10 3.49      0       0          1       0            0
-    ## 81   13   10  24    10 4.00      1       0          0       0            0
-    ## 55    8   16  21     9 3.49      0       0          0       0            0
-    ## 1     8   12  18     9 3.49      1       0          1       0            1
-    ## 39    8   15  18     9 4.00      1       0          0       0            0
-    ## 35    8   15  19     9 3.49      1       0          1       1            1
-    ## 52    8   16  19    11 3.49      1       0          0       0            0
-    ## 21    8   13  19     9 3.49      1       0          0       0            1
-    ## 90   13   14  23    11 4.00      1       0          0       0            1
-    ## 100  18   20  20    10 3.49      0       0          0       0            0
-    ## 58    8   16  18     9 4.00      1       0          0       0            0
-    ## 57    8   16  20    11 3.49      1       0          1       1            0
-    ## 97   13   21  18    10 3.49      0       0          1       1            0
-    ## 75    9   12  24     9 4.00      1       0          0       1            1
-    ## 85   13   11  18     9 4.00      1       0          1       1            0
-    ## 49    8   15  24    11 4.00      1       0          0       0            1
-    ## 30    8   14  24    12 4.00      1       0          0       0            0
-    ## 98   13   21  19    11 4.00      1       1          1       0            1
-    ## 26    8   13  18     9 4.00      1       0          0       0            0
-    ## 32    8   14  18    10 3.49      0       0          0       0            0
-    ## 33    8   14  19     9 4.00      0       0          0       0            1
-    ## 34    8   15  18    10 4.00      0       1          1       1            0
-    ## 53    8   16  20    11 3.49      1       1          1       1            1
-    ## 3     8   12  19     9 3.49      0       0          1       1            1
-    ## 83   13   10  19    10 3.49      1       0          0       0            0
-    ## 18    8   13  24    12 3.49      1       1          1       1            1
-    ## 6     8   13  19    10 4.00      0       0          0       0            1
-    ## 12    8   13  24    11 4.00      1       1          1       0            0
-    ## 24    8   13  24     9 3.49      1       0          0       0            0
-    ## 69    8   20  24    12 3.49      1       0          0       1            0
-    ## 16    8   13  24    11 4.00      0       0          0       0            0
-    ## 65    8   18  23     9 4.00      1       0          1       1            0
-    ## 86   13   11  19    11 3.49      1       0          0       0            0
-    ## 66    8   18  18    11 3.49      1       0          0       1            0
-    ## 40    8   15  24    10 2.99      1       1          1       0            1
-    ## 77    9   18  18    10 3.49      1       0          0       0            1
-    ## 46    8   15  19     9 4.00      1       0          0       1            0
-    ## 87   13   12  18     9 4.00      1       0          1       1            1
-    ## 54    8   16  19     9 4.00      1       0          1       0            1
-    ## 95   13   19  18     9 4.00      1       0          0       0            0
-    ## 51    8   16  18    10 4.00      1       0          0       1            0
-    ## 11    8   13  20     9 4.00      1       0          0       0            0
-    ## 79   13   10  18    12 4.00      1       0          0       0            0
-    ## 60    8   17  18    11 3.49      1       0          0       0            1
-    ## 19    8   13  20    10 4.00      1       0          0       1            0
-    ## 14    8   13  19     9 3.49      0       0          0       0            0
-    ## 99   13   21  23    12 4.00      1       0          0       0            0
-    ## 27    8   14  19     9 4.00      1       0          0       0            0
-    ## 74    9   12  24    11 4.00      0       0          0       1            0
-    ## 88   13   12  24     9 3.49      0       0          0       1            0
-    ## 7     8   13  23    10 4.00      1       1          1       0            1
-    ## 68    8   19  18     9 4.00      1       0          1       0            0
-    ## 93   13   16  18     9 3.49      1       0          1       0            0
-    ## 63    8   18  24     9 4.00      1       0          0       0            1
-    ## 38    8   15  19     9 2.99      1       0          1       1            1
-    ## 22    8   13  18    10 3.49      1       0          0       0            0
-    ## 29    8   14  24    11 4.00      1       1          1       1            1
-    ## 62    8   17  18     9 4.00      1       0          0       0            1
-    ## 5     8   12  23    12 3.49      0       0          0       0            0
-    ## 59    8   17  23     9 3.49      1       0          0       0            0
-    ## 2     8   12  21    10 3.49      0       0          0       1            0
-    ## 15    8   13  18    10 4.00      1       0          0       1            0
-    ## 50    8   15  23     9 2.99      1       1          1       0            1
-    ## 37    8   15  18    11 3.49      1       0          1       1            0
-    ## 73    9    7  18     9 1.99      0       0          0       0            0
-    ## 41    8   15  24    11 3.49      1       0          0       1            0
-    ## 8     8   13  18     9 4.00      1       0          0       1            0
-    ## 96   13   20  21     9 4.00      1       0          0       1            0
-    ## 78   13   10  19    11 1.99      1       0          0       0            0
-    ## 20    8   13  18    10 4.00      1       1          1       1            1
-    ## 67    8   18  19    11 3.49      0       1          1       0            1
-    ## 82   13   10  19     9 3.49      1       0          1       1            0
-    ##     treatment engineering bcs
-    ## 56          0           0   0
-    ## 76          0           1   0
-    ## 45          0           0   1
-    ## 47          0           1   0
-    ## 28          0           1   0
-    ## 36          0           1   0
-    ## 4           0           0   0
-    ## 17          0           0   0
-    ## 48          0           0   1
-    ## 81          0           0   0
-    ## 55          0           0   1
-    ## 1           0           1   0
-    ## 39          0           0   0
-    ## 35          0           0   0
-    ## 52          0           0   0
-    ## 21          0           1   0
-    ## 90          0           0   0
-    ## 100         0           0   0
-    ## 58          0           0   1
-    ## 57          0           0   0
-    ## 97          0           1   0
-    ## 75          0           0   0
-    ## 85          1           0   0
-    ## 49          0           0   1
-    ## 30          0           0   1
-    ## 98          0           0   0
-    ## 26          0           0   0
-    ## 32          0           0   1
-    ## 33          0           0   1
-    ## 34          1           0   1
-    ## 53          0           0   0
-    ## 3           0           0   0
-    ## 83          0           0   0
-    ## 18          0           0   0
-    ## 6           0           1   0
-    ## 12          0           1   0
-    ## 24          0           1   0
-    ## 69          0           0   0
-    ## 16          0           0   1
-    ## 65          0           0   0
-    ## 86          0           0   0
-    ## 66          0           0   0
-    ## 40          1           1   0
-    ## 77          0           0   0
-    ## 46          0           1   0
-    ## 87          0           0   0
-    ## 54          1           0   1
-    ## 95          0           0   0
-    ## 51          0           0   1
-    ## 11          0           0   0
-    ## 79          0           1   0
-    ## 60          0           0   0
-    ## 19          0           0   0
-    ## 14          0           1   0
-    ## 99          0           0   0
-    ## 27          0           1   0
-    ## 74          0           0   0
-    ## 88          0           0   0
-    ## 7           0           0   0
-    ## 68          0           0   0
-    ## 93          0           0   0
-    ## 63          0           1   0
-    ## 38          0           0   0
-    ## 22          0           0   0
-    ## 29          1           0   0
-    ## 62          0           0   0
-    ## 5           0           0   0
-    ## 59          0           0   0
-    ## 2           0           0   0
-    ## 15          0           0   0
-    ## 50          1           0   0
-    ## 37          0           0   0
-    ## 73          0           0   0
-    ## 41          0           0   0
-    ## 8           0           0   1
-    ## 96          0           0   1
-    ## 78          0           0   0
-    ## 20          0           0   0
-    ## 67          0           0   0
-    ## 82          0           1   0
+![](Final-Project_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
+
+want smaller RMSE
 
 ``` r
-test
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
 ```
 
-    ##    day hour age grade  gpa gender married depression anxiety panic_attack
-    ## 9    8   13  19    10 2.99      1       0          0       0            0
-    ## 10   8   13  18     9 4.00      0       0          0       1            1
-    ## 13   8   13  18     9 3.49      1       0          1       0            0
-    ## 23   8   13  24     9 4.00      1       0          0       0            0
-    ## 25   8   13  23    11 4.00      1       0          1       1            1
-    ## 31   8   14  23    10 3.49      1       0          0       0            0
-    ## 42   8   15  22    12 4.00      1       0          0       0            0
-    ## 43   8   15  20    10 3.49      1       0          1       0            0
-    ## 44   8   15  23    10 4.00      0       0          0       0            1
-    ## 61   8   17  19     9 4.00      1       0          0       0            0
-    ## 64   8   18  24     9 4.00      1       0          0       0            0
-    ## 70   8   21  24     9 3.49      1       0          0       0            0
-    ## 71   8   21  18    11 4.00      1       0          0       0            1
-    ## 72   8   23  19    11 3.49      1       1          1       0            0
-    ## 80  13   10  24    10 4.00      1       1          1       1            1
-    ## 84  13   10  23     9 3.49      0       0          0       0            0
-    ## 89  13   12  24    10 2.49      0       0          0       0            1
-    ## 91  13   15  18    10 3.49      0       0          0       1            0
-    ## 92  13   15  19    10 3.49      1       1          1       0            0
-    ## 94  13   18  24    11 1.99      1       0          0       0            1
-    ##    treatment engineering bcs
-    ## 9          0           0   0
-    ## 10         0           0   0
-    ## 13         0           0   1
-    ## 23         0           0   1
-    ## 25         0           0   1
-    ## 31         0           0   0
-    ## 42         0           1   0
-    ## 43         0           0   0
-    ## 44         0           0   0
-    ## 61         0           0   1
-    ## 64         0           1   0
-    ## 70         0           0   0
-    ## 71         0           0   0
-    ## 72         0           0   0
-    ## 80         0           0   0
-    ## 84         0           0   0
-    ## 89         0           1   0
-    ## 91         0           0   0
-    ## 92         0           0   0
-    ## 94         0           0   0
+    ##        RMSE   Rsquare
+    ## 1 0.4444798 0.1315942
 
 ``` r
-head(train)
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
 ```
 
-    ##    day hour age grade  gpa gender married depression anxiety panic_attack
-    ## 56   8   16  23    11 4.00      0       0          0       0            0
-    ## 76   9   13  23     9 3.49      1       0          1       0            0
-    ## 45   8   15  18     9 4.00      0       0          0       1            1
-    ## 47   8   15  18    12 4.00      1       0          0       0            0
-    ## 28   8   14  18    10 3.49      0       1          1       1            0
-    ## 36   8   15  18     9 2.49      1       0          0       0            0
-    ##    treatment engineering bcs
-    ## 56         0           0   0
-    ## 76         0           1   0
-    ## 45         0           0   1
-    ## 47         0           1   0
-    ## 28         0           1   0
-    ## 36         0           1   0
+    ##        RMSE    Rsquare
+    ## 1 0.4486646 0.04142889
 
 ``` r
-ks = c()
-train_accuracy = c()
-test_accuracy = c()
-binary_labels = c()
-
-for (i in 6:ncol(train)){
-  
-  colname <- colnames(train)[i]
-  if (colname == "treatment"){
-    next
-  }
-  
-  colnames(train)[i] <- "label"
-  colnames(test)[i] <- "label"
-  
-  print(colname)
-  
-  glm_1 <- glm(label~., data=train, family="binomial")
-  #predict(glm_1, train)
-  plot(glm_1)
-  
-  for (k in 1:10){
-    
-    knn_fit <- knn3(label~., data=train, k=k) 
-    p_hat_knn_train <- predict(knn_fit, train, type="prob")
-    y_hat_knn_train <- factor(ifelse(p_hat_knn_train[,2]>0.5,1,0))
-    confusionMatrix(y_hat_knn_train, factor(train$label))
-    #print(confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
-    
-    p_hat_knn_test <- predict(knn_fit, test, type="prob")
-    y_hat_knn_test <- factor(ifelse(p_hat_knn_test[,2]>0.5,1,0))
-    confusionMatrix(y_hat_knn_test, factor(test$label))
-    #print(confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
-    
-    ks <- c(ks, k)
-    train_accuracy <- c(train_accuracy, confusionMatrix(y_hat_knn_train, factor(train$label))$overall["Accuracy"])
-    test_accuracy <- c(test_accuracy, confusionMatrix(y_hat_knn_test, factor(test$label))$overall["Accuracy"])
-    binary_labels <- c(binary_labels, colname)
-  
-  }
-  
-  colnames(train)[i] <- colname
-  colnames(test)[i] <- colname
-}
+lasso_model$beta
 ```
 
-    ## [1] "gender"
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-2.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-3.png)<!-- -->
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## [1] "married"
-
-    ## Warning: glm.fit: algorithm did not converge
-
-    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-4.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-5.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-6.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-7.png)<!-- -->
-
-    ## Warning in sqrt(crit * p * (1 - hh)/hh): NaNs produced
-
-    ## Warning in sqrt(crit * p * (1 - hh)/hh): NaNs produced
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## [1] "depression"
-
-    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-8.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-9.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-10.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-11.png)<!-- -->
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-12.png)<!-- -->
-
-    ## [1] "anxiety"
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-13.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-14.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-15.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-16.png)<!-- -->
-
-    ## [1] "panic_attack"
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-17.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-18.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-19.png)<!-- -->
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-20.png)<!-- -->
-
-    ## [1] "engineering"
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-21.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-22.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-23.png)<!-- -->
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_train, factor(train$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-24.png)<!-- -->
-
-    ## [1] "bcs"
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-25.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-26.png)<!-- -->![](Final-Project_files/figure-gfm/unnamed-chunk-49-27.png)<!-- -->
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-    ## Warning in confusionMatrix.default(y_hat_knn_test, factor(test$label)): Levels
-    ## are not in the same order for reference and data. Refactoring data to match.
-
-![](Final-Project_files/figure-gfm/unnamed-chunk-49-28.png)<!-- -->
+    ## 12 x 1 sparse Matrix of class "dgCMatrix"
+    ##                       s0
+    ## day           .         
+    ## hour         -0.01116385
+    ## age           .         
+    ## grade         .         
+    ## gpa           0.12675740
+    ## gender        .         
+    ## married       .         
+    ## depression    0.17691835
+    ## panic_attack  .         
+    ## treatment     .         
+    ## engineering  -0.11145221
+    ## bcs           .
 
 ``` r
-binary_labels
+plot(lasso_model$beta)
 ```
 
-    ##  [1] "gender"       "gender"       "gender"       "gender"       "gender"      
-    ##  [6] "gender"       "gender"       "gender"       "gender"       "gender"      
-    ## [11] "married"      "married"      "married"      "married"      "married"     
-    ## [16] "married"      "married"      "married"      "married"      "married"     
-    ## [21] "depression"   "depression"   "depression"   "depression"   "depression"  
-    ## [26] "depression"   "depression"   "depression"   "depression"   "depression"  
-    ## [31] "anxiety"      "anxiety"      "anxiety"      "anxiety"      "anxiety"     
-    ## [36] "anxiety"      "anxiety"      "anxiety"      "anxiety"      "anxiety"     
-    ## [41] "panic_attack" "panic_attack" "panic_attack" "panic_attack" "panic_attack"
-    ## [46] "panic_attack" "panic_attack" "panic_attack" "panic_attack" "panic_attack"
-    ## [51] "engineering"  "engineering"  "engineering"  "engineering"  "engineering" 
-    ## [56] "engineering"  "engineering"  "engineering"  "engineering"  "engineering" 
-    ## [61] "bcs"          "bcs"          "bcs"          "bcs"          "bcs"         
-    ## [66] "bcs"          "bcs"          "bcs"          "bcs"          "bcs"
+![](Final-Project_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
+
+Panic attack
 
 ``` r
-ks
-```
+dummies_train <- dummyVars(panic_attack~ ., data = train)
+dummies_test <- dummyVars(panic_attack~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
 
-    ##  [1]  1  2  3  4  5  6  7  8  9 10  1  2  3  4  5  6  7  8  9 10  1  2  3  4  5
-    ## [26]  6  7  8  9 10  1  2  3  4  5  6  7  8  9 10  1  2  3  4  5  6  7  8  9 10
-    ## [51]  1  2  3  4  5  6  7  8  9 10  1  2  3  4  5  6  7  8  9 10
+x = as.matrix(train_dummies)
+y_train = train$panic_attack
+
+x_test = as.matrix(test_dummies)
+y_test = test$panic_attack
+```
 
 ``` r
-train_accuracy
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
 ```
 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   1.0000   0.8625   0.7750   0.7250   0.7750   0.7375   0.7625   0.7625 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.7625   0.7625   1.0000   0.9000   0.9125   0.9000   0.9125   0.8875 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.9000   0.8625   0.8500   0.8375   1.0000   0.8000   0.8375   0.7500 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.7500   0.7125   0.7125   0.7250   0.7250   0.6875   1.0000   0.7625 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.7875   0.7000   0.7250   0.6625   0.6250   0.6500   0.6375   0.6125 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   1.0000   0.8000   0.8000   0.7250   0.7125   0.7250   0.7375   0.7000 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.7000   0.6625   1.0000   0.8750   0.8500   0.8000   0.7750   0.7875 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.8000   0.8000   0.8000   0.7875   1.0000   0.8500   0.8375   0.8250 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##   0.8625   0.8625   0.8375   0.8125   0.8250   0.8500
+    ## [1] 100
 
 ``` r
-test_accuracy
+plot(lasso_reg)
 ```
 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.75     0.60     0.80     0.80     0.75     0.75     0.75     0.75 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.75     0.75     0.80     0.80     0.80     0.80     0.80     0.80 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.80     0.80     0.85     0.85     0.65     0.75     0.80     0.70 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.70     0.70     0.60     0.65     0.65     0.70     0.60     0.65 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.65     0.70     0.75     0.75     0.80     0.75     0.75     0.75 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.55     0.65     0.55     0.60     0.55     0.70     0.70     0.70 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.65     0.65     0.80     0.75     0.80     0.85     0.85     0.85 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.85     0.85     0.85     0.85     0.75     0.80     0.75     0.85 
-    ## Accuracy Accuracy Accuracy Accuracy Accuracy Accuracy 
-    ##     0.85     0.80     0.80     0.80     0.80     0.80
+![](Final-Project_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
+
+want smaller RMSE
 
 ``` r
-knn_dataframe <- data.frame(ks,train_accuracy,test_accuracy,binary_labels)
-knn_dataframe
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
 ```
 
-    ##    ks train_accuracy test_accuracy binary_labels
-    ## 1   1         1.0000          0.75        gender
-    ## 2   2         0.8625          0.60        gender
-    ## 3   3         0.7750          0.80        gender
-    ## 4   4         0.7250          0.80        gender
-    ## 5   5         0.7750          0.75        gender
-    ## 6   6         0.7375          0.75        gender
-    ## 7   7         0.7625          0.75        gender
-    ## 8   8         0.7625          0.75        gender
-    ## 9   9         0.7625          0.75        gender
-    ## 10 10         0.7625          0.75        gender
-    ## 11  1         1.0000          0.80       married
-    ## 12  2         0.9000          0.80       married
-    ## 13  3         0.9125          0.80       married
-    ## 14  4         0.9000          0.80       married
-    ## 15  5         0.9125          0.80       married
-    ## 16  6         0.8875          0.80       married
-    ## 17  7         0.9000          0.80       married
-    ## 18  8         0.8625          0.80       married
-    ## 19  9         0.8500          0.85       married
-    ## 20 10         0.8375          0.85       married
-    ## 21  1         1.0000          0.65    depression
-    ## 22  2         0.8000          0.75    depression
-    ## 23  3         0.8375          0.80    depression
-    ## 24  4         0.7500          0.70    depression
-    ## 25  5         0.7500          0.70    depression
-    ## 26  6         0.7125          0.70    depression
-    ## 27  7         0.7125          0.60    depression
-    ## 28  8         0.7250          0.65    depression
-    ## 29  9         0.7250          0.65    depression
-    ## 30 10         0.6875          0.70    depression
-    ## 31  1         1.0000          0.60       anxiety
-    ## 32  2         0.7625          0.65       anxiety
-    ## 33  3         0.7875          0.65       anxiety
-    ## 34  4         0.7000          0.70       anxiety
-    ## 35  5         0.7250          0.75       anxiety
-    ## 36  6         0.6625          0.75       anxiety
-    ## 37  7         0.6250          0.80       anxiety
-    ## 38  8         0.6500          0.75       anxiety
-    ## 39  9         0.6375          0.75       anxiety
-    ## 40 10         0.6125          0.75       anxiety
-    ## 41  1         1.0000          0.55  panic_attack
-    ## 42  2         0.8000          0.65  panic_attack
-    ## 43  3         0.8000          0.55  panic_attack
-    ## 44  4         0.7250          0.60  panic_attack
-    ## 45  5         0.7125          0.55  panic_attack
-    ## 46  6         0.7250          0.70  panic_attack
-    ## 47  7         0.7375          0.70  panic_attack
-    ## 48  8         0.7000          0.70  panic_attack
-    ## 49  9         0.7000          0.65  panic_attack
-    ## 50 10         0.6625          0.65  panic_attack
-    ## 51  1         1.0000          0.80   engineering
-    ## 52  2         0.8750          0.75   engineering
-    ## 53  3         0.8500          0.80   engineering
-    ## 54  4         0.8000          0.85   engineering
-    ## 55  5         0.7750          0.85   engineering
-    ## 56  6         0.7875          0.85   engineering
-    ## 57  7         0.8000          0.85   engineering
-    ## 58  8         0.8000          0.85   engineering
-    ## 59  9         0.8000          0.85   engineering
-    ## 60 10         0.7875          0.85   engineering
-    ## 61  1         1.0000          0.75           bcs
-    ## 62  2         0.8500          0.80           bcs
-    ## 63  3         0.8375          0.75           bcs
-    ## 64  4         0.8250          0.85           bcs
-    ## 65  5         0.8625          0.85           bcs
-    ## 66  6         0.8625          0.80           bcs
-    ## 67  7         0.8375          0.80           bcs
-    ## 68  8         0.8125          0.80           bcs
-    ## 69  9         0.8250          0.80           bcs
-    ## 70 10         0.8500          0.80           bcs
+    ##        RMSE Rsquare
+    ## 1 0.4635124       0
 
 ``` r
-ggplot(knn_dataframe, aes(x=ks)) +
-  geom_line(aes(y = train_accuracy), color = "red") + 
-  geom_line(aes(y = test_accuracy), color = "blue") +
-  facet_wrap(~binary_labels)
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
 ```
 
-![](Final-Project_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+    ##        RMSE     Rsquare
+    ## 1 0.4976507 -0.03190104
+
+``` r
+lasso_model$beta
+```
+
+    ## 12 x 1 sparse Matrix of class "dgCMatrix"
+    ##             s0
+    ## day          0
+    ## hour         .
+    ## age          .
+    ## grade        .
+    ## gpa          .
+    ## gender       .
+    ## married      .
+    ## depression   .
+    ## anxiety      .
+    ## treatment    .
+    ## engineering  .
+    ## bcs          .
+
+``` r
+plot(lasso_model$beta)
+```
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-70-1.png)<!-- -->
+
+Treatment
+
+``` r
+dummies_train <- dummyVars(treatment~ ., data = train)
+dummies_test <- dummyVars(treatment~ ., data = test)
+train_dummies = predict(dummies_train, newdata = train)
+test_dummies = predict(dummies_test, newdata = test)
+
+x = as.matrix(train_dummies)
+y_train = train$treatment
+
+x_test = as.matrix(test_dummies)
+y_test = test$treatment
+```
+
+``` r
+lambdas <- 10^seq(2, -3, by = -.1)
+
+# Setting alpha = 1 implements lasso regression
+lasso_reg <- cv.glmnet(x, y_train, alpha = 1, lambda = lambdas, standardize = TRUE, nfolds = 10)
+
+# Best 
+lambda_best <- lasso_reg$lambda.min 
+lambda_best
+```
+
+    ## [1] 0.03981072
+
+``` r
+plot(lasso_reg)
+```
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-73-1.png)<!-- -->
+
+want smaller RMSE
+
+``` r
+lasso_model <- glmnet(x, y_train, alpha = 1, lambda = lambda_best, standardize = TRUE)
+
+predictions_train <- predict(lasso_model, s = lambda_best, newx = x)
+eval_results(y_train, predictions_train, train)
+```
+
+    ##        RMSE   Rsquare
+    ## 1 0.2396408 0.1722133
+
+``` r
+predictions_test <- predict(lasso_model, s = lambda_best, newx = x_test)
+eval_results(y_test, predictions_test, test)
+```
+
+    ##        RMSE Rsquare
+    ## 1 0.1136082    -Inf
+
+``` r
+lasso_model$beta
+```
+
+    ## 12 x 1 sparse Matrix of class "dgCMatrix"
+    ##                      s0
+    ## day          .         
+    ## hour         .         
+    ## age          .         
+    ## grade        .         
+    ## gpa          .         
+    ## gender       .         
+    ## married      0.14409650
+    ## depression   0.06445601
+    ## anxiety      .         
+    ## panic_attack .         
+    ## engineering  .         
+    ## bcs          .
+
+``` r
+plot(lasso_model$beta)
+```
+
+![](Final-Project_files/figure-gfm/unnamed-chunk-76-1.png)<!-- -->
